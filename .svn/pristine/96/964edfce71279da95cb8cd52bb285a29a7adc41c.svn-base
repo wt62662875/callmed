@@ -1,0 +1,485 @@
+//
+//  ViewController.m
+//  callmed
+//
+//  Created by sam on 16/7/10.
+//  Copyright © 2016年 sam. All rights reserved.
+//
+
+#import "HomeController.h"
+#import "TabBarView.h"
+#import "DriverCarController.h"
+#import "UserInComeController.h"
+#import "TripCataController.h"
+#import "MessageController.h"
+
+//#import "RegisterController.h"
+#import "LoginController.h"
+#import "UserCenterController.h"
+#import "DriverRegisterController.h"
+#import "DriverInfoEditController.h"
+#import "TestController.h" //test
+#import "DriverRegisterController.h"
+
+#import "NoticeSpecialView.h"
+#import "NoticeViewCommon.h"
+#import "NoticeBusView.h"
+#import "NoticeBusCommonView.h"
+
+#import "NotificationModel.h"
+#import "OrderModel.h"
+
+@interface HomeController ()<TargetActionDelegate>
+
+@property (nonatomic,strong) TabBarView *bottomView;
+@property (nonatomic,strong) BaseController *currentController;
+@property (nonatomic,strong) NSMutableArray *dataArray;
+@end
+
+@implementation HomeController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(openLoginController:) name:NOTICE_NEED_SIGN object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orderNotice:) name:NOTICE_ORDER_STATE_UPDATE object:nil];
+    //[[NSNotificationCenter defaultCenter]  postNotificationName:NOTICE_ORDER_STATE_UPDATE object:payloadMsg];
+    NSLog(@"CommonUtility compare:%ld",(long)[CommonUtility compareDateStringToNow:@"2016-09-03 10:00:00" withFormat:nil]);
+    [self initData];
+    [self initView];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+}
+
+- (void) initData
+{
+    [self addChildViewController:[[TripCataController alloc] init]];
+    [self addChildViewController:[[DriverCarController alloc] init]];//DriverRegisterController.h DriverCarController
+    [self addChildViewController:[[UserInComeController alloc] init]];
+    _dataArray =[NSMutableArray array];
+    
+    
+    NSMutableArray *da  =[NSMutableArray array];
+    [da addObject:@"1"];
+    [da addObject:@"2"];
+    [da addObject:@"3"];
+    [da removeLastObject];
+    [da enumerateObjectsUsingBlock:^(id  obj, NSUInteger idx, BOOL * stop) {
+        NSLog(@"left objet:%@ %ld",obj,(long)idx);
+    }];
+}
+
+- (void) viewDidAppear:(BOOL)animated
+{
+    NSLog(@"verfiy:%@",[GlobalData sharedInstance].user.userInfo.passed);
+    if(![GlobalData sharedInstance].user.isLogin)
+    {
+        [self openLoginController:nil];
+    }else if([@"0" isEqualToString:[GlobalData sharedInstance].user.userInfo.passed]&&
+            (![GlobalData sharedInstance].user.userInfo.licenseNo||
+             [[GlobalData sharedInstance].user.userInfo.licenseNo length]==0))
+    {
+        DriverInfoEditController *registers = [[DriverInfoEditController alloc] init];
+        [self.navigationController pushViewController:registers animated:YES];
+    }else{
+//        TestController *test = [[TestController alloc] init];
+//        [self.navigationController pushViewController:test animated:YES];
+    }
+//    DriverRegisterController *ps = [[DriverRegisterController alloc] init];
+//    [self.navigationController pushViewController:ps animated:YES];
+    
+    if([GlobalData sharedInstance].user.isLogin && [@"0" isEqualToString:[GlobalData sharedInstance].user.userInfo.passed ])
+    {
+        NSString *upReason = [GlobalData sharedInstance].user.userInfo.upReason;
+        if(upReason)
+        {
+            [self showAlertMessage:[NSString stringWithFormat:@"审批未通过: %@",upReason]];
+        }else{
+            [self showAlertMessage:@"您的信息已经提交，等待审核通过。"];
+        }
+        
+    }else{
+        
+    }
+}
+
+- (void) initView
+{
+    [self.leftButton setImage:[UIImage imageNamed:@"top_set"] forState:UIControlStateNormal];
+//    [self setRightButtonText:@"注销" withFont:[UIFont systemFontOfSize:14]];
+//    [self.rightButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//    [self.rightButton addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.rightButton setImage:[UIImage imageNamed:@"top_msg"] forState:UIControlStateNormal];
+    [self.rightButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    [self.rightButton addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
+    
+//    if([GlobalData sharedInstance].user.isLogin && [@"0" isEqualToString:[GlobalData sharedInstance].user.userInfo.passed ])
+//    {
+////        [self.rightButton setHidden:NO];
+//        [self showAlertMessage:@"您的信息已经提交，等待审核通过。"];
+//    }else{
+////        [self.rightButton setHidden:YES];
+//    }
+    
+    _bottomView =[[TabBarView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    [_bottomView setBackgroundColor:[UIColor whiteColor]];
+    [self.view addSubview:_bottomView];
+    [_bottomView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.view);
+        make.left.equalTo(self.view);
+        make.width.equalTo(self.view);
+        make.height.mas_equalTo(60);
+    }];
+    [_bottomView setDelegate:self];
+    [_bottomView setSelectIndex:0];
+    [self buttonSelectedIndex:0];
+}
+
+- (void) buttonSelectedIndex:(NSInteger)index
+{
+    if (_currentController) {
+        [_currentController.view removeFromSuperview];
+    }
+    _currentController = self.childViewControllers[index];
+    [_currentController reloadData];
+    [self.view addSubview:_currentController.view];
+    [_currentController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.headerView.mas_bottom);
+        make.bottom.equalTo(self.bottomView.mas_top);
+        make.left.equalTo(self.view);
+        make.right.equalTo(self.view);
+    }];
+    [self setTitle:_currentController.title];
+    if ([GlobalData sharedInstance].user.isLogin) {
+        [self.rightButton setHidden:NO];
+        if (index==2) {
+            [self setRightButtonText:@"注销" withFont:[UIFont systemFontOfSize:14]];
+            [self.rightButton setImage:nil forState:UIControlStateNormal];
+        }else{
+            [self setRightButtonText:nil withFont:[UIFont systemFontOfSize:14]];
+            [self setRightButtonImage:@"top_msg"];
+        }
+    }else{
+        [self.rightButton setHidden:YES];
+    }
+    [self fetchOrderNumber];
+}
+
+- (void) openLoginController:(id)sender
+{
+    if (![LoginController hasVisiabled]) {
+        LoginController *registers = [[LoginController alloc] init];
+        [self.navigationController pushViewController:registers animated:YES];
+    }else{
+        NSLog(@"LoginController has prensent");
+    }
+}
+
+- (void) buttonTarget:(id)sender
+{
+    if (sender== self.leftButton) {
+        UserCenterController *mUserCenter = [[UserCenterController alloc] init];
+        [self.navigationController pushViewController:mUserCenter animated:YES];
+    }else if(sender == self.rightButton)
+    {
+        NSLog(@"%@",self.rightButton.titleLabel.text);
+        if (self.rightButton.titleLabel.text==nil) {
+            MessageController *message = [[MessageController alloc] init];
+            [self.navigationController pushViewController:message animated:YES];
+        }else{
+            [self.rightButton setHidden:YES];
+            [[GlobalData sharedInstance].user logout];
+            [self openLoginController:nil];
+        }
+    }else if([sender isKindOfClass:[NoticeSpecialView class]])
+    {
+        NoticeSpecialView *orderView = (NoticeSpecialView*)sender;
+        NotificationModel *order = orderView.model;
+        if ([order.oType integerValue]==1) {
+            
+            if(_currentController &&[_currentController isKindOfClass:[TripCataController class]])
+            {
+                ((TripCataController*)_currentController).notice_model = order;
+            }
+            [_bottomView setSelectIndex:0];
+            [self buttonSelectedIndex:0];
+            if ([@"1" isEqualToString:order.type]) {
+                [orderView dismiss];
+                [OrderModel driverRobOrderId:order.ids driver:[GlobalData sharedInstance].user.userInfo.ids succes:^(NSDictionary *resultDictionary) {
+                    [MBProgressHUD showAndHideWithMessage:@"您已获取到当前订单！" forHUD:nil];
+                    [self buttonSelectedIndex:0];
+                } failed:^(NSInteger errorCode, NSString *errorMessage) {
+                    [MBProgressHUD showAndHideWithMessage:errorMessage forHUD:nil];
+                }];
+                
+            }else if ([@"7" isEqualToString:order.type])
+            {   [orderView dismiss];
+                [MBProgressHUD showAndHideWithMessage:@"订单已被取消!" forHUD:nil];
+                [self buttonSelectedIndex:0];
+            }else if([@"2" isEqualToString:order.type]){
+                [orderView dismiss];
+                if (orderView.buttonType==1) {
+                    [OrderModel driverDenyOrderById:order.ids driver:[GlobalData sharedInstance].user.userInfo.ids succes:^(NSDictionary *resultDictionary) {
+                        [MBProgressHUD showAndHideWithMessage:@"您已拒绝请求！" forHUD:nil];
+                    } failed:^(NSInteger errorCode, NSString *errorMessage) {
+                        [MBProgressHUD showAndHideWithMessage:errorMessage forHUD:nil];
+                    }];
+                }
+            }else{
+                [orderView dismiss];
+            }
+            
+        }else if([order.oType integerValue]==2){
+            NotificationModel *order = orderView.model;
+            if ([order.oType integerValue]==1) {
+            
+            }
+        }
+        [orderView dismiss];
+        [_dataArray removeObject:orderView];
+        NSLog(@"_dataArray:%ld",(long)_dataArray.count);
+    }else if([sender isKindOfClass:[NoticeViewCommon class]]){
+        NoticeViewCommon *orderView = (NoticeViewCommon*)sender;
+        NotificationModel *order = orderView.model;
+        if ([order.oType integerValue]==1) {
+            
+        }
+        [orderView dismiss];
+        [_dataArray removeObject:orderView];
+         NSLog(@"_dataArray:%ld",(long)_dataArray.count);
+    }else if([sender isKindOfClass:[NoticeBusView class]]){
+//        NoticeBusView *orderView = (NoticeBusView*)sender;
+//        NotificationModel *order = orderView.model;
+//        if ([order.oType integerValue]==1) {
+//            
+//        }
+//        [orderView dismiss];
+    }
+}
+
+- (void) orderNotice:(NSNotification*)notification
+{
+    NotificationModel *order = [[NotificationModel alloc] initWithDictionary:notification.userInfo error:nil];
+    NSLog(@"NotificationModel:%@",notification.userInfo);
+    if (order && ![order isTimeout]) {
+        if ([@"12" isEqualToString:order.type]) {
+            NoticeBusView *noticView = [[NoticeBusView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+            noticView.delegate = self;
+            [noticView setModel:order];
+            [self.view addSubview:noticView];
+            [noticView mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.top.equalTo(self.view);
+                make.left.equalTo(self.view);
+                make.right.equalTo(self.view);
+                make.bottom.equalTo(self.view);
+            }];
+        }else if ([@"1" isEqualToString:order.oType]) {
+            switch ([order.type integerValue]) {
+                case 1:
+                {
+                    NoticeSpecialView *noticeView = [[NoticeSpecialView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+                    noticeView.delegate = self;
+                    noticeView.bizType=@"0";
+                    [noticeView setModel:order];
+                    [self.view addSubview:noticeView];
+                    [noticeView mas_makeConstraints:^(MASConstraintMaker *make) {
+                        make.top.equalTo(self.view);
+                        make.left.equalTo(self.view);
+                        make.right.equalTo(self.view);
+                        make.bottom.equalTo(self.view);
+                    }];
+                    [_dataArray addObject:noticeView];
+                }
+                    break;
+                case 2:
+                {
+                    [_currentController reloadData];
+                }break;
+                case 7:
+                {
+                    NoticeViewCommon *noticeView = [[NoticeViewCommon alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+                    noticeView.delegate = self;
+                    [noticeView setModel:order];
+                    [self.view addSubview:noticeView];
+                    [noticeView mas_makeConstraints:^(MASConstraintMaker *make) {
+                        make.top.equalTo(self.view);
+                        make.left.equalTo(self.view);
+                        make.right.equalTo(self.view);
+                        make.bottom.equalTo(self.view);
+                    }];
+                    [_dataArray addObject:noticeView];
+                }break;
+                case 4:
+                {
+                    
+                }break;
+                case 20:
+                {
+                    [self showAlertMessage:@"暂无业务处理!"];
+                }break;
+                default:
+                    break;
+            }
+            if (_currentController) {
+                [_currentController reloadData];
+            }
+        }else if([@"2" isEqualToString:order.oType]){
+            switch ([order.type integerValue])
+            {
+                case 7:
+                    [self showCommNotice:order];
+                    break;
+                case 20:
+                {
+                    [self showAlertMessage:@"暂无业务处理!"];
+                }break;
+                    default:
+                    break;
+            }
+            
+            if (_currentController) {
+                [_currentController reloadData];
+            }
+        }else if([@"3" isEqualToString:order.oType]){
+            switch ([order.type integerValue])
+            {
+                case 7:
+                    [self showCommNotice:order];
+                    break;
+                case 20:
+                {
+                    [self showAlertMessage:@"暂无业务处理!"];
+                }break;
+                default:
+                    break;
+            }
+            if (_currentController) {
+                [_currentController reloadData];
+            }
+        }else if([@"4" isEqualToString:order.oType]){
+            if ([@"12" isEqualToString:order.type]) {
+                NoticeBusView *noticView = [[NoticeBusView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+                noticView.delegate = self;
+                [noticView setModel:order];
+                [self.view addSubview:noticView];
+                [noticView mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.top.equalTo(self.view);
+                    make.left.equalTo(self.view);
+                    make.right.equalTo(self.view);
+                    make.bottom.equalTo(self.view);
+                }];
+            }else if ([@"17" isEqualToString:order.type]) {
+                NoticeBusCommonView *noticeView = [[NoticeBusCommonView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+                noticeView.delegate = self;
+                [noticeView setModel:order];
+                [self.view addSubview:noticeView];
+                [noticeView mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.top.equalTo(self.view);
+                    make.left.equalTo(self.view);
+                    make.right.equalTo(self.view);
+                    make.bottom.equalTo(self.view);
+                }];
+            }else if([@"20" isEqualToString:order.type]){
+            
+                    [self showAlertMessage:@"暂无业务处理!"];
+            
+            }
+            if (_currentController) {
+                [_currentController reloadData];
+            }
+        }
+    }
+}
+
+- (void) fetchOrderNumber
+{
+   
+}
+
+- (void) buttonSelected:(UIView*)view Index:(NSInteger)index
+{
+    if([view isKindOfClass:[NoticeBusView class]]){
+        NoticeBusView *orderView = (NoticeBusView*)view;
+        NotificationModel *order = orderView.model;
+        if (index==1) {
+            [[GlobalData sharedInstance].fastBusDict setObject:[OrderModel convertFrom:order] forKey:order.phoneNo];
+            [orderView dismiss];
+            [OrderModel dConfirmPreByOrderId:order.ids driver:[GlobalData sharedInstance].user.userInfo.ids succes:^(NSDictionary *resultDictionary) {
+                [MBProgressHUD showAndHideWithMessage:@"您接受请求！" forHUD:nil];
+            } failed:^(NSInteger errorCode, NSString *errorMessage) {
+                [MBProgressHUD showAndHideWithMessage:errorMessage forHUD:nil];
+            }];
+            if ([_currentController isKindOfClass:[TripCataController class]]) {
+                order.oType = @"4";
+                ((TripCataController*)_currentController).notice_model = order;
+            }
+            [self buttonSelectedIndex:0];
+        }else if(index ==2){
+            [orderView dismiss];
+            if (orderView.buttonType==0) {
+                [OrderModel dDenyPreByOrderId:order.ids driver:[GlobalData sharedInstance].user.userInfo.ids succes:^(NSDictionary *resultDictionary) {
+                    [MBProgressHUD showAndHideWithMessage:@"您已拒绝请求！" forHUD:nil];
+                } failed:^(NSInteger errorCode, NSString *errorMessage) {
+                    [MBProgressHUD showAndHideWithMessage:errorMessage forHUD:nil];
+                }];
+            }
+        }
+        [orderView dismiss];
+    }else if([view isKindOfClass:[NoticeBusCommonView class]]){
+        NoticeBusCommonView *orderView = (NoticeBusCommonView*)view;
+        if (index==1 && orderView.model.ids) {
+            
+//            __weak __typeof(&*self) weakSelf = self;
+            NSMutableArray *temp = [NSMutableArray array];
+            [[GlobalData sharedInstance].fastBusDict enumerateKeysAndObjectsUsingBlock:^(id key, OrderModel *obj, BOOL *stop) {
+                NSLog(@"%@ %@",key,obj);
+                if ([obj.ids isEqualToString:orderView.model.ids]) {
+                    [temp addObject:key];
+                }
+            }];
+            
+            if ([temp count]>0) {
+                [[GlobalData sharedInstance].fastBusDict removeObjectForKey:[temp lastObject]];
+            }
+            [self buttonSelectedIndex:0];
+        }
+        [orderView dismiss];
+    }
+}
+
+- (void) showCommNotice:(NotificationModel*)order
+{
+    NoticeViewCommon *noticeView = [[NoticeViewCommon alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    noticeView.delegate = self;
+    [noticeView setModel:order];
+    [self.view addSubview:noticeView];
+    [noticeView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.view);
+        make.left.equalTo(self.view);
+        make.right.equalTo(self.view);
+        make.bottom.equalTo(self.view);
+    }];
+    [_dataArray addObject:noticeView];
+}
+
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+
+- (void) showAlertMessage:(NSString*)msg
+{
+    [self showAlertMessage:msg withTitle:@"温馨提示"];
+}
+
+- (void) showAlertMessage:(NSString*)msg withTitle:(NSString*)title
+{
+    [JCAlertView showOneButtonWithTitle:title Message:msg ButtonType:JCAlertViewButtonTypeWarn ButtonTitle:@"知道了" Click:^{
+        
+    }];
+}
+@end

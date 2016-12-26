@@ -1,0 +1,47 @@
+//
+//  EditCommiteCell.m
+//  callmed
+//
+//  Created by sam on 16/8/19.
+//  Copyright © 2016年 sam. All rights reserved.
+//
+
+#import "EditCommiteCell.h"
+
+@interface EditCommiteCell()
+
+@property (nonatomic,strong) UIButton *submit;
+
+@end
+
+@implementation EditCommiteCell
+
+
+- (void) initView
+{
+    _submit =[UIButton buttonWithType:UIButtonTypeCustom];
+    [_submit setTitle:@"确定提交并继续完善信息" forState:UIControlStateNormal];
+    [_submit setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [_submit setBackgroundColor:RGBHex(g_red)];
+    [_submit.layer setCornerRadius:5];
+    [_submit.layer setMasksToBounds:YES];
+    [_submit setBackgroundImage:[ImageTools imageWithColor:RGBHex(g_red)] forState:UIControlStateNormal];
+    [_submit setBackgroundImage:[ImageTools imageWithColor:RGBHex(g_gray)] forState:UIControlStateHighlighted];
+    [_submit addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_submit];
+    [_submit mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self);
+        make.height.mas_equalTo(40);
+        make.left.equalTo(self).offset(30);
+        make.right.equalTo(self).offset(-30);
+    }];
+}
+
+- (void) buttonTarget:(id)sender
+{
+    if (_delegate && [_delegate respondsToSelector:@selector(buttonTarget:)]) {
+        [_delegate buttonTarget:sender];
+    }
+}
+
+@end

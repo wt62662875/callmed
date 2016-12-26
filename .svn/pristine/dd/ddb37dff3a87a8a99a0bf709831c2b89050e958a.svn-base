@@ -1,0 +1,406 @@
+//
+//  DriverRegisterController.m
+//  callmed
+//
+//  Created by sam on 16/7/26.
+//  Copyright © 2016年 sam. All rights reserved.
+//
+
+#import "DriverRegisterController.h"
+#import "BrowerController.h"
+
+#import "MultiplePhotoView.h"
+#import "PhotoTitleView.h"
+
+@interface PhotoModel : NSObject
+@property (nonatomic,strong) PhotoTitleView *view;
+@property (nonatomic,strong) UIImage *image;
+@end
+
+@interface DriverRegisterController ()<TargetActionDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate,UIActionSheetDelegate,UIScrollViewDelegate>
+@property (nonatomic,strong) UIScrollView *containerView;
+@property (nonatomic,strong) UIView *mainContainerView;
+@property (nonatomic,strong) MultiplePhotoView *photoView;
+@property (nonatomic,strong) UIButton *buttonService;
+@property (nonatomic,strong) UIButton *buttonApply;
+@property (nonatomic,strong) PhotoTitleView *currentPhotoView;
+@property (nonatomic,strong) UILabel *tipLabel;
+@property (nonatomic,strong) dispatch_queue_t qt;
+@property (nonatomic,strong) NSMutableDictionary *taskArray;
+
+@property (nonatomic,strong) MBProgressHUD *hud;
+@end
+
+@implementation DriverRegisterController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    _qt = dispatch_queue_create("upload_image", nil);
+    _taskArray = [NSMutableDictionary dictionary];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTask:) name:@"PHOTO_UPDATE" object:nil];
+    [self initView];
+}
+
+
+- (void) initView
+{
+    [self setTitle:@"上传认证照片"];
+    [self.leftButton setImage:[UIImage imageNamed:@""] forState:UIControlStateNormal];
+    _containerView =[[UIScrollView alloc] initWithFrame:self.view.bounds];
+    _containerView.scrollEnabled = YES;
+    _containerView.contentSize = CGSizeMake(kScreenSize.width, 470);
+    _containerView.delegate = self;
+    [self.view addSubview:_containerView];
+    [_containerView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.headerView.mas_bottom);
+        make.left.equalTo(self.view);
+        make.width.equalTo(self.view);
+        make.bottom.equalTo(self.view);
+    }];
+    
+    _mainContainerView=[[UIView alloc] initWithFrame:CGRectMake(0,0,_containerView.contentSize.width,_containerView.contentSize.height)];
+    
+    [_containerView addSubview:_mainContainerView];
+    
+    _tipLabel =[[UILabel alloc] init];
+    [_tipLabel setFont:[UIFont systemFontOfSize:13]];
+    [_tipLabel setText:@"  请上传以下照片"];
+    [_tipLabel setBackgroundColor:RGBHex(g_m_c)];
+    [_tipLabel setTextColor:[UIColor whiteColor]];
+    [_mainContainerView addSubview:_tipLabel];
+    [_tipLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(_mainContainerView);
+        make.top.equalTo(_mainContainerView);
+        make.width.mas_equalTo(kScreenSize.width);
+        make.height.mas_equalTo(45);
+    }];
+    _photoView = [[MultiplePhotoView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    _photoView.delegate = self;
+    [_photoView setDataArray:[NSArray arrayWithObjects:@"身份证照片正面",
+                              @"身份证照片背面",
+                              /*@"本人照片",*/
+                              @"驾驶证照片",
+                              @"行驶证照片",
+                              /*@"车辆照片",
+                              @"人车合影照片",
+                              @"人车合影照片2",*/nil]];
+    [_mainContainerView addSubview:_photoView];
+    [_photoView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(_tipLabel.mas_bottom);
+        make.left.equalTo(_mainContainerView);
+        make.width.equalTo(_mainContainerView);
+        make.height.mas_equalTo(250);
+    }];
+    
+    _buttonService =[UIButton buttonWithType:UIButtonTypeCustom];
+    [_buttonService setTitle:@"查看呼我服务条款" forState:UIControlStateNormal];
+    [_buttonService setTitleColor:RGBHex(g_m_c) forState:UIControlStateNormal];
+    [_buttonService setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+    [_buttonService.layer setCornerRadius:5];
+    [_buttonService.titleLabel setFont:[UIFont systemFontOfSize:14]];
+    [_buttonService setBackgroundImage:[ImageTools imageWithColor:[UIColor whiteColor]] forState:UIControlStateNormal];
+    [_buttonService setBackgroundImage:[ImageTools imageWithColor:RGBHex(g_gray_cc)] forState:UIControlStateHighlighted];
+    [_buttonService.layer setMasksToBounds:YES];
+    [_buttonService addTarget:self action:@selector(buttonTargetSubmit:) forControlEvents:UIControlEventTouchUpInside];
+    _buttonService.layer.borderColor =  RGBHex(g_m_c).CGColor;
+    _buttonService.layer.borderWidth = 1.0;
+    [_buttonService setHidden:YES];
+    [_buttonService setEnabled:NO];
+    [_mainContainerView addSubview:_buttonService];
+    [_buttonService mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(_photoView.mas_bottom);
+        make.left.equalTo(_mainContainerView).offset(20);
+        make.right.equalTo(_mainContainerView).offset(-20);
+        make.height.mas_equalTo(40);
+    }];
+    
+    
+    
+    _buttonApply =[UIButton buttonWithType:UIButtonTypeCustom];
+    [_buttonApply setEnabled:YES];
+    [_buttonApply setTitle:@"同意条款并确认申请" forState:UIControlStateNormal];
+    [_buttonApply.titleLabel setFont:[UIFont systemFontOfSize:14]];
+    [_buttonApply setTitleColor:RGBHex(g_m_c) forState:UIControlStateNormal];
+    [_buttonApply setTitleColor:[UIColor whiteColor] forState:UIControlStateDisabled];
+    [_buttonApply.layer setCornerRadius:5];
+    [_buttonApply setBackgroundImage:[ImageTools imageWithColor:[UIColor whiteColor]] forState:UIControlStateNormal];
+    [_buttonApply setBackgroundImage:[ImageTools imageWithColor:RGBHex(g_gray_cc)] forState:UIControlStateDisabled];
+    [_buttonApply.layer setMasksToBounds:YES];
+    [_buttonApply addTarget:self action:@selector(buttonTargetSubmit:) forControlEvents:UIControlEventTouchUpInside];
+    _buttonApply.layer.borderColor = RGBHex(g_m_c).CGColor;
+    _buttonApply.layer.borderColor = RGBHex(g_gray_cc).CGColor;//RGBHex(g_m_c).CGColor
+    _buttonApply.layer.borderWidth = 1.0;
+    [_mainContainerView addSubview:_buttonApply];
+    [_buttonApply mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(_photoView.mas_bottom).offset(20);
+        make.left.equalTo(_mainContainerView).offset(20);
+        make.right.equalTo(_mainContainerView).offset(-20);
+        make.height.mas_equalTo(40);
+    }];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+}
+
+- (void) viewWillLayoutSubviews
+{
+    NSLog(@"self.view.frame.size.width:%f",self.view.frame.size.width);
+    _containerView.contentSize = CGSizeMake(self.view.frame.size.width, 470);//self.view.frame.size.width
+    _mainContainerView=[[UIView alloc] initWithFrame:CGRectMake(0,0,_containerView.contentSize.width,_containerView.contentSize.height)];
+}
+
+#pragma mark -  TargetButtonDelegate
+- (void)buttonTarget:(id)sender
+{
+    if (sender == self.leftButton) {
+        [self.navigationController popToRootViewControllerAnimated:YES];
+    }else if([sender isKindOfClass:[PhotoTitleView class]]){
+        _currentPhotoView = (PhotoTitleView*)sender;
+        [_buttonApply setEnabled:YES];
+        //[_taskArray setObject:_currentPhotoView forKey:[NSString stringWithFormat:@"%ld",(long)_currentPhotoView.tag]];
+        [self openPhotoChoiceDialog];
+    }
+}
+
+/*
+ private String picFront;
+ private String picBack;
+ private String selfPic;
+ private String certPic;
+ private String carPic;
+ private String passPic;
+ private String cdPic1;
+ private String cdPic2;
+ 正， 反， 自身照片， 驾驶证， 车， 行车， 人车1， 人车2
+ */
+
+
+- (void)buttonTargetSubmit:(UIButton*)button
+{
+    if (button == self.buttonService) {
+        BrowerController *brower = [[BrowerController alloc] init];
+        brower.titleStr =@"呼我服务条款";
+        brower.urlStr = @"";
+        [self.navigationController pushViewController:brower animated:YES];
+        
+    }else if (button == _buttonApply)
+    {
+        if (_taskArray && _taskArray.count>0)
+        {
+            _hud = [MBProgressHUD showProgressView:@"正在提交数据..." inView:nil];
+            [_hud show:YES];
+            [_taskArray enumerateKeysAndObjectsUsingBlock:^(NSString* key, PhotoTitleView *obj, BOOL *stop) {
+                [obj setIndicatorHidden:NO];
+                dispatch_async(_qt, ^{
+                    NSData *data = UIImagePNGRepresentation(obj.imageData);
+                    NSString *iconData = [data base64EncodedStringWithOptions:0];
+                    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+                    if ([@"身份证照片正面" isEqualToString:obj.title]) {
+                        [params setObject:iconData forKey:@"picFront"];
+                    }else if ([@"身份证照片背面" isEqualToString:obj.title]) {
+                        [params setObject:iconData forKey:@"picBack"];
+                    }else if ([@"本人照片" isEqualToString:obj.title]) {
+                        [params setObject:iconData forKey:@"selfPic"];
+                    }else if ([@"驾驶证照片" isEqualToString:obj.title]) {
+                        [params setObject:iconData forKey:@"certPic"];
+                    }else if ([@"行驶证照片" isEqualToString:obj.title]) {
+                        [params setObject:iconData forKey:@"passPic"];
+                    }else if ([@"车辆照片" isEqualToString:obj.title]) {
+                        [params setObject:iconData forKey:@"carPic"];
+                    }else if ([@"人车合影照片" isEqualToString:obj.title]) {
+                        [params setObject:iconData forKey:@"cdPic1"];
+                    }else if ([@"人车合影照片2" isEqualToString:obj.title]) {
+                        [params setObject:iconData forKey:@"cdPic2"];
+                    }
+                    
+                    [params setObject:[GlobalData sharedInstance].user.userInfo.ids forKey:@"id"];
+                    [UserInfoModel uploadImageData:params succ:^(NSDictionary *resultDictionary) {
+                        [obj setIndicatorHidden:YES];
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"PHOTO_UPDATE" object:obj];
+                        
+                    } failed:^(NSInteger errorCode, NSString *errorMessage) {
+                        [obj setIndicatorHidden:YES];
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"PHOTO_UPDATE" object:obj];
+                    }];
+                });
+            }];
+        }
+    }
+}
+
+- (void) updateTask:(NSNotification*)notification
+{
+    if ([notification.object isKindOfClass:[PhotoTitleView class]]) {
+        [_taskArray removeObjectForKey:[NSString stringWithFormat:@"%ld",(long)((PhotoTitleView*)notification.object).tag]];
+    }
+    if (_taskArray.count==0) {
+        if (_hud) {
+            [_hud hide:YES];
+        }
+        _hud = nil;
+        [MBProgressHUD showAndHideWithMessage:@"提交完成" forHUD:nil];
+        [self.navigationController popToRootViewControllerAnimated:YES];
+    }
+}
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+- (void) openPhotoChoiceDialog
+{
+    if (iOS8Later){
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *takePhotoAction = [UIAlertAction actionWithTitle:@"拍照" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self takePhoto];
+        }];
+        UIAlertAction *selectPhotoAction = [UIAlertAction actionWithTitle:@"从手机相册选择" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self photoLibrary];
+        }];
+        [alertController addAction:cancelAction];
+        [alertController addAction:takePhotoAction];
+        [alertController addAction:selectPhotoAction];
+        if (alertController) {
+            [self presentViewController:alertController animated:YES completion:nil];
+        }}else if(iOS7Later)
+        {
+            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"选择图片"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"取消"
+                                                 destructiveButtonTitle:@"拍照" otherButtonTitles:@"从手机相册选择", nil];
+            [sheet showInView:self.view];
+        }
+    
+}
+
+#pragma  mark - Photo Choice
+
+#pragma mark - 从相册中选择
+- (void)photoLibrary
+{
+    //从相册选择
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    //资源类型为图片库
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    picker.delegate = self;
+    //设置选择后的图片可被编辑
+    picker.allowsEditing = YES;
+    [self presentViewController:picker animated:YES  completion:^(){}];
+    
+}
+
+#pragma mark 拍照
+-(void)takePhoto{
+    //资源类型为照相机
+    UIImagePickerControllerSourceType sourceType = UIImagePickerControllerSourceTypeCamera;
+    //判断是否有相机
+    if ([UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeCamera]){
+        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+        picker.delegate = self;
+        //设置拍照后的图片可被编辑
+        picker.allowsEditing = YES;
+        //资源类型为照相机
+        picker.sourceType = sourceType;
+        [self presentViewController:picker animated:YES completion:^(){}];
+    }else {
+        [MBProgressHUD showTextHUBWithText:@"相机不可用" inView:nil];
+    }
+}
+
+- (void) actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex==0) {
+        [self takePhoto];
+    }else if(buttonIndex==1){
+        [self photoLibrary];
+    }
+}
+// 对图片尺寸进行压缩 和 转格式
+- (void)imagechange
+{
+    // 对图片尺寸进行压缩
+    UIImage * hehehe = nil;
+    UIImage * imageNew = [self imageWithImage:hehehe scaledToSize:CGSizeMake(300, 40)];
+    NSData *data;
+    //判断图片是不是png格式的文件
+    if (UIImagePNGRepresentation(imageNew)) {
+        //返回为png图像。
+        data =   UIImagePNGRepresentation(imageNew);
+    }else {
+        //返回为JPEG图像。
+        data = UIImageJPEGRepresentation(imageNew,0);
+    }
+    
+}
+
+//对图片尺寸进行压缩
+-(UIImage*)imageWithImage:(UIImage*)image scaledToSize:(CGSize)newSize
+{
+    UIGraphicsBeginImageContext(newSize);
+    
+    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
+    
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
+
+
+// 从相册选择完成调用的代理方法
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image editingInfo:(nullable NSDictionary<NSString *,id> *)editingInfo
+{
+    if (_currentPhotoView)
+    {
+        [_currentPhotoView setImageData:image];
+        [_taskArray setObject:_currentPhotoView forKey:[NSString stringWithFormat:@"%ld",(long)_currentPhotoView.tag]];
+    }
+    /*
+    self.headerImage=image;
+    NSData *data = UIImagePNGRepresentation(image);
+    _iconData = [data base64EncodedStringWithOptions:0];
+    
+    NSArray *d = _dataArray[0];
+    BaseCellModel *md = d[0];
+    md.value = _iconData;
+    md.hasChanged = @"1";
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    [self.mTableView reloadData];
+    */
+}
+
+#pragma mark 取消 imagePickerController
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
+{
+    
+    [picker dismissViewControllerAnimated:YES completion:^{}];//隐藏相机图片
+    UIImage *image = info[UIImagePickerControllerEditedImage];
+    if (image) {
+        [self imagePickerController:nil didFinishPickingImage:image editingInfo:nil];
+    }
+}
+
+- (void) testQuery
+{
+    dispatch_sync(_qt, ^{
+        
+    });
+}
+
+- (void)dealloc{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+@end

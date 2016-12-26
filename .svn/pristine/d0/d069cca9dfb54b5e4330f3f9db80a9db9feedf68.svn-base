@@ -1,0 +1,73 @@
+//
+//  CarStatusCell.m
+//  callmed
+//
+//  Created by sam on 16/7/27.
+//  Copyright © 2016年 sam. All rights reserved.
+//
+
+#import "CarStatusCell.h"
+
+@interface CarStatusCell()
+
+@property (nonatomic,strong) UIButton *buttonStatus;
+
+@end
+
+@implementation CarStatusCell
+
+- (instancetype) initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        [self initView];
+    }
+    return self;
+}
+
+- (void) initView
+{
+    _buttonStatus=[UIButton buttonWithType:UIButtonTypeCustom];
+    [_buttonStatus.layer setCornerRadius:5];
+    [_buttonStatus.layer setMasksToBounds:YES];
+    [_buttonStatus.layer setBorderColor:RGBHex(g_m_c).CGColor];
+    [_buttonStatus.layer setBorderWidth:1];
+    [_buttonStatus.titleLabel setFont:[UIFont systemFontOfSize:15]];
+    [_buttonStatus setUserInteractionEnabled:NO];
+    [self addSubview:_buttonStatus];
+    [_buttonStatus mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self);
+        make.right.equalTo(self).offset(-10);
+        make.width.mas_equalTo(120);
+        make.height.mas_equalTo(40);
+    }];
+}
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+}
+
+- (void) setModel:(CarStatusModel *)model
+{
+    _model = model;
+    [self.textLabel setText:model.title];
+    [self.imageView setImage:[UIImage imageNamed:model.imageUrl]];
+    if (0 ==_model.status) {
+        [self.buttonStatus setTitle:@"出车" forState:UIControlStateNormal];
+        [self.buttonStatus setTitleColor:RGBHex(g_m_c) forState:UIControlStateNormal];
+        [self.buttonStatus.layer setBorderColor:RGBHex(g_m_c).CGColor];
+
+    }else{
+        [self.buttonStatus setTitle:@"收车" forState:UIControlStateNormal];
+        [self.buttonStatus setTitleColor:RGBHex(g_m_red) forState:UIControlStateNormal];
+        [self.buttonStatus.layer setBorderColor:RGBHex(g_m_red).CGColor];
+    }
+    
+}
+
+@end

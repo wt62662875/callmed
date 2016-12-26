@@ -1,0 +1,11 @@
+/* 
+  Localizable.strings
+  callmed
+
+  Created by wt on 16/9/19.
+  Copyright © 2016年 sam. All rights reserved.
+*/
+"REMIND"="提示";
+"OK"="确定";
+"CANCEL"="取消";
+"NetworkConnectError"="网络连接失败";

@@ -1,0 +1,86 @@
+//
+//  CarIncomeView.m
+//  callmed
+//
+//  Created by sam on 16/8/18.
+//  Copyright © 2016年 sam. All rights reserved.
+//
+
+#import "CarIncomeView.h"
+
+@interface CarIncomeView()
+
+@property (nonatomic,strong) UILabel *titleLabel;
+@property (nonatomic,strong) UILabel *orderLabel;
+@property (nonatomic,strong) UILabel *incomeLabel;
+
+@end
+
+
+@implementation CarIncomeView
+
+- (instancetype) initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self initView];
+    }
+    return self;
+}
+
+- (void) initView
+{
+    _titleLabel = [[UILabel alloc] init];
+    [_titleLabel setFont:[UIFont systemFontOfSize:15]];
+    [self addSubview:_titleLabel];
+    [_titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self).offset(20);
+        make.top.equalTo(self);
+    }];
+    
+    _orderLabel = [[UILabel alloc] init];
+    [_orderLabel setText:@"订单:"];
+    [_orderLabel setFont:[UIFont systemFontOfSize:13]];
+    [self addSubview:_orderLabel];
+    [_orderLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.mas_centerY);
+        make.left.equalTo(self).offset(10);
+    }];
+    
+    _incomeLabel = [[UILabel alloc] init];
+    [_incomeLabel setText:@"收入:"];
+    [_incomeLabel setFont:[UIFont systemFontOfSize:13]];
+    [self addSubview:_incomeLabel];
+    [_incomeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.mas_centerY);
+        make.left.equalTo(_orderLabel.mas_right).offset(10);
+    }];
+}
+
+- (void) setTitle:(NSString *)title
+{
+    _title = title;
+    [_titleLabel setText:_title];
+}
+
+- (void) setNumber:(NSString *)number
+{
+    _number = number;
+    NSString *tvalue = [NSString stringWithFormat:@"订单:%@",_number];
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:tvalue];
+    [text addAttribute:NSForegroundColorAttributeName value:[UIColor grayColor] range:[tvalue rangeOfString:@"订单:"]];
+    [text addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:[tvalue rangeOfString:_number]];
+    [_orderLabel setAttributedText:text];
+}
+
+- (void) setMoney:(NSString *)money
+{
+    _money = money;
+    NSString *tvalue = [NSString stringWithFormat:@"收入:%@",_money];
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:tvalue];
+    [text addAttribute:NSForegroundColorAttributeName value:[UIColor grayColor] range:[tvalue rangeOfString:@"收入:"]];
+    [text addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:[tvalue rangeOfString:_money]];
+    [_incomeLabel setAttributedText:text];
+}
+
+@end

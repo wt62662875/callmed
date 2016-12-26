@@ -1,0 +1,111 @@
+//
+//  callmed.pch
+//  callmed
+//
+//  Created by sam on 16/7/10.
+//  Copyright © 2016年 sam. All rights reserved.
+//
+
+// 定义任意的singleton对象
+#define SYNTHESIZE_SINGLETON_FOR_CLASS(classname) \
+\
+static classname *shared##classname = nil; \
+\
++ (classname *)shared##classname \
+{ \
+@synchronized(self) \
+{ \
+if (shared##classname == nil) \
+{ \
+shared##classname = [[self alloc] init]; \
+} \
+} \
+\
+return shared##classname; \
+}
+
+#ifndef callmed_pch
+#define callmed_pch
+
+//网络请求头文件
+#import "HttpAFNetworkEngine.h"
+#import "AFNetworkActivityIndicatorManager.h"
+
+#import "UIImageView+WebCache.h"
+
+
+#import "MJRefresh.h"
+#import "MBProgressHUD.h"
+#import "MBProgressHUD+ZXCExtension.h"
+#import "MBProgressHUD+LKAddition.h"
+
+#import "JSONModel.h"
+#import "LKJSONKit.h"
+#import <SDWebImage/SDWebImageManager.h>
+#import <Masonry.h>
+#import <TZImagePickerController.h>
+#import <IQKeyboardManager.h>
+
+#import "AppDelegate.h"
+#import "BaseModel.h"
+#import "ThirdPartyLogin.h"
+#import "GlobalData.h"
+#import "SandBoxHelper.h"
+#import "NSString+Extension.h"
+#import "UIColor+Hex.h"
+#import "ImageTools.h"
+#import "UIImageView+Circle.h"
+#import "JCAlertView.h"
+#import "CommonUtility.h"
+#import "OrderDistance.h"
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+#define kScreenSize   [[UIScreen mainScreen] bounds].size
+
+#define MAPAPIKey @"a1c5fc3f404eaf56ecd4df4026cbf1ec"    //高德APIKEY
+#define IOS_VERSION [[[UIDevice currentDevice] systemVersion] floatValue]
+
+#define RGB(r,g,b) [UIColor colorWithRed:(r)/255.0f green:(g)/255.0f blue:(b)/255.0f alpha:1]
+#define RGBA(r,g,b,alp) [UIColor colorWithRed:(r)/255.0f green:(g)/255.0f blue:(b)/255.0f alpha:alp]
+#define RGBHex(a) [UIColor colorWithHexString:a]
+#define RGBHexa(a,b) [UIColor colorWithHexString:a alpha:b]
+
+#define scaleImage(str,l,t,r,b) [[UIImage imageNamed:str] resizableImageWithCapInsets:UIEdgeInsetsMake(l, t, r, b) resizingMode:UIImageResizingModeStretch]
+/**** 用户信息更新  ******/
+#define NOTICE_USERINFO_UPDATE @"NOTICE_USERINFO_UPDATE_C"
+
+/**** 用户信息更新  *****/
+#define NOTICE_IMAGE_DOWNLOAD_FINISH @"NOTICE_IMAGE_DOWNLOAD_FINISH_C"
+
+#define NOTICE_ORDER_STATE_UPDATE @"NOTICE_ORDER_STATE_UPDATE"
+#define NOTICE_NEED_SIGN @"NOTICE_NEED_SIGN"
+#define NOTICE_NEED_REDBALL @"NOTICE_NEED_REDBALL"
+/*** 更新定位状态 ***/
+#define NOTICE_LOCATION_START @"NOTICE_LOCATION_START"
+
+#define NOTICE_LOCATION_STOP  @"NOTICE_LOCATION_STOP"
+#define g_gray  @"#cccccc"          //若辅助内容
+#define g_gray_cc  @"#cccccc"       //若辅助内容
+#define g_gray_99 @"#999999"
+#define g_gray_54 @"#545e73"
+#define g_red  @"#14be32"           //主色调
+#define g_assit_f6 @"#f6f6f6"
+#define g_m_c @"#14be32"          //主色调
+#define g_m_red @"#ff2e31"          //红色
+#define g_m_black @"#222222"
+#define g_m_t @"#545e73"
+#define g_black @"#222222"          //主内容色调
+#define g_header_c @"ff4e22"
+#define g_green @"#14be32"          //主色绿色
+
+#define g_assit_c  @"#6f7b89"       //辅助内容色调
+#define g_assit_c1 @"#6f7b89"
+#define g_assit_blue @"4baafa"            //
+#define g_assit_orign @"f4674b"           //
+#define g_assit_yellow @"ffa63e"
+#define g_assit_green @"50bd3e"
+#define g_assit_purple @"7d5dbd"
+#define g_assit_gray @"ebebeb"
+#define g_assit_gray_eee @"ebebeb"
+#endif /* callme_pch */

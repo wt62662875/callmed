@@ -1,0 +1,207 @@
+//
+//  AppDelegate.m
+//  callmed
+//
+//  Created by sam on 16/7/10.
+//  Copyright © 2016年 sam. All rights reserved.
+//
+
+#import "AppDelegate.h"
+#import "HomeController.h"
+#import "AppDelegate+CategorySet.h"
+#import "AppDelegate+ThirdLogin.h"
+#import "AppDelegate+AMap.h"
+#import "CMSearchManager.h"
+#import "OrderDistance.h"
+
+@interface AppDelegate () <AMapLocationManagerDelegate>
+@property (nonatomic,strong) AMapLocationManager *locationManager;
+@property (nonatomic,strong) OrderDistance *distances;
+@end
+
+@implementation AppDelegate
+
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //保持屏幕常亮
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+    //设置网络亲求时，状态了里展示请求的进度条
+    [AFNetworkActivityIndicatorManager sharedManager].enabled = YES;
+    [UIApplication sharedApplication].idleTimerDisabled=YES;
+    // 创建键盘管理工具单利
+    IQKeyboardManager *keyBoardManager = [IQKeyboardManager sharedManager];
+    keyBoardManager.enable = YES;
+    keyBoardManager.shouldResignOnTouchOutside = YES;
+    keyBoardManager.shouldToolbarUsesTextFieldTintColor = YES;
+    keyBoardManager.enableAutoToolbar = NO;
+    
+    self.window = [[UIWindow alloc]init];
+    self.window.frame = [UIScreen mainScreen].bounds;
+    _distances = [[OrderDistance alloc] init];
+    
+    UINavigationController *navctrl = [[UINavigationController alloc] initWithRootViewController:[[HomeController alloc]init]];
+    self.window.rootViewController = navctrl;
+    [self.window makeKeyAndVisible];
+    
+    [self configureAPIKey];
+    [self configIFlySpeech];
+    [self configLocation];
+    
+    [HttpShareEngine sharedInstance];               //开始服务监听网络变化
+    [self APNS:launchOptions];                      //注册APN推送业务
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startLocation) name:NOTICE_LOCATION_START object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopLocation) name:NOTICE_LOCATION_STOP object:nil];
+    return YES;
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void) configLocation
+{
+    _locationManager = [[AMapLocationManager alloc] init];
+    _locationManager.delegate = self;
+    [_locationManager setLocationTimeout:6];
+    [_locationManager setReGeocodeTimeout:3];
+    [_locationManager setDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];//kCLLocationAccuracyBest
+    [self startLocation];
+}
+
+- (void) startLocation
+{
+    NSLog(@"startLocation");
+    [_locationManager startUpdatingLocation];
+}
+
+- (void)stopLocation
+{
+    NSLog(@"stopLocation");
+    [_locationManager stopUpdatingLocation];
+}
+- (void) amapLocationManager:(AMapLocationManager *)manager didFailWithError:(NSError *)error
+{
+    NSLog(@"error:%@",error);
+}
+
+- (void)amapLocationManager:(AMapLocationManager *)manager didUpdateLocation:(CLLocation *)location
+{
+    /*NSLog(@"location:{lat:%f; lon:%f; accuracy:%f}",
+          location.coordinate.latitude,
+          location.coordinate.longitude,
+          location.horizontalAccuracy);*/
+    if ([GlobalData sharedInstance].coordinate.latitude!=0) {
+        
+        CLLocation *oLocation = [[CLLocation alloc] initWithLatitude:[GlobalData sharedInstance].coordinate.latitude longitude:[GlobalData sharedInstance].coordinate.longitude];
+        CLLocationDistance distance_s = [oLocation distanceFromLocation:location];
+        
+        //记录时时两点距离作为行程距离
+        [GlobalData sharedInstance].distances = [GlobalData sharedInstance].distances + distance_s;
+        if (distance_s>=10) {
+            
+            
+            [[GlobalData sharedInstance].dictDistance enumerateKeysAndObjectsUsingBlock:^(id key, OrderDistance *obj, BOOL *stop) {
+                obj.distancef = obj.distancef+distance_s;
+                obj.location = location;
+                [obj.pointsArray addObject:location];
+                if (obj.slocation==nil) {
+                    obj.slocation = location;
+                }else{
+                    CLLocationDistance old_distance = [obj.slocation distanceFromLocation:location];
+                    if (old_distance<=30) {
+                        obj.distancef =30;
+                    }
+                }
+            }];
+            if ([[GlobalData sharedInstance].dictDistance count]>0) {
+                NSLog(@"有订单 distance:%@",[GlobalData sharedInstance].dictDistance);
+            }else{
+                NSLog(@"没有订单");
+            }
+            
+            NSString *sLongitude = [NSString stringWithFormat:@"%f",location.coordinate.longitude];
+            NSString *sLatitude =[NSString stringWithFormat:@"%f",location.coordinate.latitude];
+            if ([GlobalData sharedInstance].user.isLogin) {
+                [CommonUtility updateLocationWithLongitude:sLongitude latitude:sLatitude success:^(NSDictionary *resultDictionary) {
+                    NSLog(@"%@",resultDictionary);
+                } failed:^(NSInteger errorCode, NSString *errorMessage) {
+                    NSLog(@"%@",errorMessage);
+                }];
+            }
+        }
+        [GlobalData sharedInstance].coordinate = location.coordinate;
+    }else{
+        [GlobalData sharedInstance].coordinate = location.coordinate;
+        if (location) {
+            CLLocation *cllocation=[[CLLocation alloc] initWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude];
+            [[CMSearchManager sharedInstance] searchLocation:cllocation completionBlock:^(id request,
+                                                                                        CMLocation *location,
+                                                                                        NSError *error){
+                if (error)
+                {
+                    NSLog(@"error :%@", error);
+                }else{
+                    NSLog(@"location :%@", location);
+                    [GlobalData sharedInstance].location = location;
+                    [GlobalData sharedInstance].city = location.city;
+                }
+                
+            }];
+        }
+    }
+    
+    
+    
+    
+    //[self locateAction];
+}
+
+- (void)locateAction
+{
+    //带逆地理的单次定位
+    [_locationManager requestLocationWithReGeocode:YES completionBlock:^(CLLocation *location, AMapLocationReGeocode *regeocode, NSError *error) {
+        
+        if (error)
+        {
+            NSLog(@"locError:{%ld - %@};", (long)error.code, error.localizedDescription);
+            
+            if (error.code == AMapLocationErrorLocateFailed)
+            {
+                return;
+            }
+        }
+        
+        //定位信息
+        NSLog(@"location:%@", location);
+        
+        //逆地理信息
+        if (regeocode)
+        {
+            NSLog(@"reGeocode:%@", regeocode);
+        }
+    }];
+}
+
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+@end

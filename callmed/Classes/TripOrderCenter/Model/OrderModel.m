@@ -1,0 +1,315 @@
+//
+//  OrderModel.m
+//  callmec
+//
+//  Created by sam on 16/7/7.
+//  Copyright © 2016年 sam. All rights reserved.
+//
+
+#import "OrderModel.h"
+
+@implementation OrderModel
+
+
++ (OrderModel*) convertFrom:(NotificationModel*)model
+{
+    OrderModel *order = [[OrderModel alloc] initWithDictionary:[model toDictionary] error:nil];
+    order.slocation = model.sLocation;
+    order.slatitude = model.sLatitude;
+    order.slongitude = model.sLongitude;
+    
+    order.elocation = model.eLocation;
+    order.elatitude = model.eLatitude;
+    order.elongitude = model.eLongitude;
+    order.mPhoneNo = model.phoneNo;
+    order.mRealName = model.memberName;
+    
+    return order;
+}
+/**
+  获取订单ID
+ **/
++ (void) fetchOrderListById:(NSString*)ids types:(NSString*)type page:(NSInteger)page succes:(QuerySuccessListBlock)suc failed:(QueryErrorBlock)fail
+{
+    [OrderModel fetchOrderListByUserId:nil fristId:@"1" types:type page:page succes:suc failed:fail];
+}
+
++ (void) fetchOrderListByUserId:(NSString*)ids fristId:(NSString *)fid types:(NSString *)type page:(NSInteger)page succes:(QuerySuccessListBlock)suc failed:(QueryErrorBlock)fail
+{
+    
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    if (ids) {
+        [param setObject:ids forKey:@"driverId"];
+    }
+    if (type) {
+        [param setObject:type forKey:@"type"];
+    }
+    if (page>=0) {
+        [param setObject:[NSString stringWithFormat:@"%ld",(long)page] forKey:@"page"];
+    }
+    [param setObject:@"5" forKey:@"pageSize"];
+    [param setObject:[NSString stringWithFormat:@"%f",[GlobalData sharedInstance].coordinate.longitude] forKey:@"longitude"];
+    [param setObject:[NSString stringWithFormat:@"%f",[GlobalData sharedInstance].coordinate.latitude] forKey:@"latitude"];
+    [param setObject:@"1" forKey:@"state"];
+    if (fid) {
+        [param setObject:fid forKey:@"latest"];
+    }
+//    [param setObject:@"desc" forKey:@"orderBy"];
+    if ([@"2" isEqualToString:type]) {
+        [param setObject:@"-1" forKey:@"carType"];
+    }
+    //
+
+    [HttpShareEngine callWithFormParams:param withMethod:@"listOrder" succList:^(NSArray *result, int pageCount, int recordCount) {
+        if (suc) {
+            suc(result,pageCount,recordCount);
+        }
+    } fail:fail];
+
+}
+
++ (void) fetchCarPoolingOrderListById:(NSString*)ids types:(NSString*)type page:(NSInteger)page succes:(QuerySuccessListBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    if (ids) {
+        [param setObject:ids forKey:@"driverId"];
+    }
+    if (type) {
+        [param setObject:type forKey:@"type"];
+    }
+    if (page>=0) {
+        [param setObject:[NSString stringWithFormat:@"%ld",(long)page] forKey:@"page"];
+    }
+    [param setObject:@"5" forKey:@"pageSize"];
+    [param setObject:[NSString stringWithFormat:@"%f",[GlobalData sharedInstance].coordinate.longitude] forKey:@"longitude"];
+    [param setObject:[NSString stringWithFormat:@"%f",[GlobalData sharedInstance].coordinate.latitude] forKey:@"latitude"];
+    [param setObject:@"20" forKey:@"state"];
+    [param setObject:@"1" forKey:@"latest"];
+    
+    [HttpShareEngine callWithFormParams:param withMethod:@"listOrder" succList:^(NSArray *result, int pageCount, int recordCount) {
+        if (suc) {
+            suc(result,pageCount,recordCount);
+        }
+    } fail:fail];
+}
+
++ (void) fetchMyOrderListById:(NSString*)ids types:(NSString*)type page:(NSInteger)page succes:(QuerySuccessListBlock)suc failed:(QueryErrorBlock)fail
+{
+
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    if (ids) {
+        [param setObject:ids forKey:@"driverId"];
+    }
+    if (type) {
+        [param setObject:type forKey:@"type"];
+    }
+    if (page>=0) {
+        [param setObject:[NSString stringWithFormat:@"%ld",(long)page] forKey:@"page"];
+    }
+    [param setObject:@"5" forKey:@"pageSize"];
+    [param setObject:@"20" forKey:@"state"];
+//    [param setObject:@"desc" forKey:@"orderBy"];
+    [param setObject:[NSString stringWithFormat:@"%f",[GlobalData sharedInstance].coordinate.longitude] forKey:@"longitude"];
+    [param setObject:[NSString stringWithFormat:@"%f",[GlobalData sharedInstance].coordinate.latitude] forKey:@"latitude"];
+    [HttpShareEngine callWithFormParams:param withMethod:@"listOrder" succ:^(NSDictionary *resultDictionary) {
+        NSString *total =[resultDictionary objectForKey:@"total"];
+        NSArray *dataList =[resultDictionary objectForKey:@"rows"];
+        if (suc) {
+            suc(dataList,(int)page,[total intValue]);
+        }
+        
+    } fail:^(NSInteger errorCode, NSString *errorMessage) {
+        if (fail) {
+            fail(errorCode,errorMessage);
+        }
+    }];
+}
+
++ (void) driverAcceptOrder:(NSString*)orderId driverId:(NSString*)driverId succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (orderId) {
+        [params setObject:orderId forKey:@"id"];
+    }
+    if (driverId) {
+        [params setObject:driverId forKey:@"driverId"];
+    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"confirmOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void) driverArrival:(NSString*)orderId succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (orderId) {
+        [params setObject:orderId forKey:@"id"];
+    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"reachOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void) driverStartTrip:(NSString*)orderId succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (orderId) {
+        [params setObject:orderId forKey:@"id"];
+    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"startOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void) driverStartPackageTrip:(NSMutableDictionary*)params succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+//    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+//    if (orderId) {
+//        [params setObject:orderId forKey:@"id"];
+//    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"packageOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
+
++ (void) driverOverTrip:(NSMutableDictionary*)params succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    [HttpShareEngine callWithFormParams:params withMethod:@"endOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
+/**抢单**/
++ (void) driverRobOrderId:(NSString*)orderId driver:(NSString*)driverId succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (orderId) {
+        [params setObject:orderId forKey:@"id"];
+    }
+    if (driverId) {
+        [params setObject:driverId forKey:@"driverId"];
+    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"grabOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void) driverDenyOrderById:(NSString*)orderId driver:(NSString*)driverId succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (orderId) {
+        [params setObject:orderId forKey:@"id"];
+    }
+    if (driverId) {
+        [params setObject:driverId forKey:@"driverId"];
+    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"denyOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void)caculateOrderInfo:(NSString*)orderId withType:(NSString*)type distance:(NSString*)distance succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (orderId) {
+        [params setObject:orderId forKey:@"id"];
+    }
+    if (type) {
+        [params setObject:type forKey:@"type"];
+    }
+    if (distance) {
+        [params setObject:distance forKey:@"distance"];
+    }
+    [OrderModel caculateOrderInfoByParams:params succes:suc failed:fail];
+}
+
++ (void)caculateOrderInfoByParams:(NSMutableDictionary*)params succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    [HttpShareEngine callWithFormParams:params withMethod:@"calculateOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void) driverOrderNumberBydriverId:(NSString*)driverId latesd:(NSString*)latest succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (latest) {
+        [params setObject:latest forKey:@"latest"];
+    }else{
+        [params setObject:@"3" forKey:@"latest"];
+    }
+    if (driverId) {
+        [params setObject:driverId forKey:@"driverId"];
+    }
+    [params setObject:@"1" forKey:@"state"];
+    [params setObject:@"-1" forKey:@"carType"];
+    [params setObject:[NSString stringWithFormat:@"%f",[GlobalData sharedInstance].coordinate.longitude] forKey:@"longitude"];
+    [params setObject:[NSString stringWithFormat:@"%f",[GlobalData sharedInstance].coordinate.latitude] forKey:@"latitude"];
+    //carType = -1
+    NSLog(@"params:%@",params);
+    [HttpShareEngine callWithFormParams:params withMethod:@"getOrderNum" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void) dConfirmPreByOrderId:(NSString*)orderId driver:(NSString*)driverId succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (orderId) {
+        [params setObject:orderId forKey:@"id"];
+    }
+    if (driverId) {
+        [params setObject:driverId forKey:@"driverId"];
+    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"confirmPreOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void) dDenyPreByOrderId:(NSString*)orderId driver:(NSString*)driverId succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if (orderId) {
+        [params setObject:orderId forKey:@"id"];
+    }
+    if (driverId) {
+        [params setObject:driverId forKey:@"driverId"];
+    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"denyPreOrder" succ:^(NSDictionary *resultDictionary) {
+        if (suc) {
+            suc(resultDictionary);
+        }
+    } fail:fail];
+}
+
++ (void)dCancelPreByOrderId:(NSString*)ids reason:(NSString*)reason succes:(QuerySuccessBlock)suc failed:(QueryErrorBlock)fail
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if(ids)[params setObject:ids forKey:@"id"];
+    if (reason) {
+        [params setObject:reason forKey:@"cancelReason"];
+    }
+    [HttpShareEngine callWithFormParams:params withMethod:@"cancelPreOrder" succ:suc fail:fail];
+}
+@end
