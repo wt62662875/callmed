@@ -73,6 +73,16 @@
         [MBProgressHUD showAndHideWithMessage:@"系统繁忙，请稍后再试..." forHUD:nil];
     }];
 
+    [MBProgressHUD showAndHideWithMessage:@"正在加载数据中....." forHUD:nil];
+    
+//    NSDictionary *params = [[NSDictionary alloc]initWithObjectsAndKeys:@"1",@"type",nil];
+//    [HttpShareEngine callWithFormParams:params withMethod:@"getDepartmentTree" succ:^(NSDictionary *resultDictionary) {
+//        NSLog(@"%@",resultDictionary);
+//        
+//        
+//    } fail:^(NSInteger errorCode, NSString *errorMessage) {
+//        [MBProgressHUD showAndHideWithMessage:@"系统繁忙，请稍后再试..." forHUD:nil];
+//    }];
 }
 
 

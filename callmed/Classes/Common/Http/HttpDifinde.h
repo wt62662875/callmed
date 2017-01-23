@@ -41,9 +41,9 @@ typedef void (^DownloadFail)(NSInteger code,NSString *message);
 
 #define kserviceBase kservice   // 只要改变kserviceBase后面的值，就可以达到下面的全改
 
-#define kserviceURL_Test @"http://work.huwochuxing.com/"
+#define kserviceURL_Test @"https://work.huwochuxing.com/"
 /*kserviceBase @"/app.php"*/
-#define kserviceURL @"http://work.huwochuxing.com/"
+#define kserviceURL @"https://work.huwochuxing.com/"
 /*kserviceBase @"/app.php"*/
 
 

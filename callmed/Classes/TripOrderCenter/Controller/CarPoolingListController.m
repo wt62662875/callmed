@@ -88,7 +88,6 @@
         make.left.equalTo(self.view);
         make.right.equalTo(self.view);
         make.bottom.equalTo(self.view);
-        //make.edges.equalTo(self.view);
     }];
     
     [_mTableView reloadData];
@@ -209,21 +208,21 @@
 
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTICE_NEED_REDBALL object:nil];
     if (![GlobalData sharedInstance].user.isLogin) {
-        [self.mTableView.mj_header endRefreshing];
+        [self endRefreshData:YES];
         [MBProgressHUD showAndHideWithMessage:@"您还没有登录或者登录已经失效！请重新登录." forHUD:nil];
         return;
     }
     
     if (![@"2" isEqualToString:[GlobalData sharedInstance].user.userInfo.type]) {
         [MBProgressHUD showAndHideWithMessage:@"当前出车类型不是快车." forHUD:nil];
-        [self.mTableView.mj_header endRefreshing];
+        [self endRefreshData:YES];
         [_dataArray removeAllObjects];
         [self.mTableView reloadData];
         return;
     }
     if ([[GlobalData sharedInstance].user.userInfo.ready isEqualToString:@"0"]) {
         [MBProgressHUD showAndHideWithMessage:@"请出车后再选择订单." forHUD:nil];
-        [self.mTableView.mj_header endRefreshing];
+        [self endRefreshData:YES];
         [_dataArray removeAllObjects];
         [self.mTableView reloadData];
         return;
@@ -271,12 +270,13 @@
                     [_dataArray addObject:model];
                 }
             }
-            [self.mTableView.mj_header endRefreshing];
+            [self endRefreshData:YES];
             [self.mTableView reloadData];
         }
+        [self endRefreshData:YES];
         
     } failed:^(NSInteger errorCode, NSString *errorMessage) {
-        [self.mTableView.mj_header endRefreshing];
+        [self endRefreshData:NO];
         NSLog(@"errorMessage:%@",errorMessage);
     }];
 }

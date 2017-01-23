@@ -116,7 +116,7 @@
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 3;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -137,16 +137,18 @@
         [cell setTimes:_times];
         [cell setOrderId:_model.ids];
         return cell;
-    }else if (indexPath.section==1)
-    {
-        static NSString *cellId =@"cellId";
-        BalanceExtraCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
-        if (!cell) {
-            cell =[[BalanceExtraCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
-        }
-        cell.dataValue = _dataValue;
-        return cell;
-    }else if(indexPath.section==2)
+    }
+//    else if (indexPath.section==1)
+//    {
+//        static NSString *cellId =@"cellId";
+//        BalanceExtraCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+//        if (!cell) {
+//            cell =[[BalanceExtraCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
+//        }
+//        cell.dataValue = _dataValue;
+//        return cell;
+//    }
+    else if(indexPath.section==1)
     {
         static NSString *cellIdbutton =@"cellIdbutton";
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdbutton];
@@ -162,7 +164,7 @@
 
 //            make.centerX.equalTo(cell);
             make.centerY.equalTo(cell);
-            make.height.mas_equalTo(40);
+            make.height.mas_equalTo(50);
 //            make.width.mas_equalTo(200);
         }];
         return cell;
@@ -180,8 +182,9 @@
             }
         }
         return 200;
-    }else if (indexPath.section==2) {
-        return 100;
+    }
+    else if (indexPath.section==1) {
+        return 70;
     }
     
     return 200;
@@ -251,21 +254,21 @@
     CLLocationDistance total_distance = [start distanceFromLocation:end];
     CLLocationDistance current_distance = [start distanceFromLocation:current];
     
-    NSLog(@"%f",[_model.slatitude floatValue]);
-    NSLog(@"%f",[_model.slongitude floatValue]);
-    
-    NSLog(@"%f",[_model.elatitude floatValue]);
-    NSLog(@"%f",[_model.elongitude floatValue]);
+//    NSLog(@"%f",[_model.slatitude floatValue]);
+//    NSLog(@"%f",[_model.slongitude floatValue]);
+//    
+//    NSLog(@"%f",[_model.elatitude floatValue]);
+//    NSLog(@"%f",[_model.elongitude floatValue]);
+//
+//    NSLog(@"%f",[GlobalData sharedInstance].coordinate.latitude );
+//    NSLog(@"%f",[GlobalData sharedInstance].coordinate.longitude);
+//
+//    NSLog(@"%f",total_distance);
+//    NSLog(@"%f",current_distance);
 
-    NSLog(@"%f",[GlobalData sharedInstance].coordinate.latitude );
-    NSLog(@"%f",[GlobalData sharedInstance].coordinate.longitude);
-
-    NSLog(@"%f",total_distance);
-    NSLog(@"%f",current_distance);
-
     
     
-    if ((current.coordinate.latitude!=0.0f&&current.coordinate.longitude!=0)&&(current_distance/total_distance)<0.15f) {
+    if ((current.coordinate.latitude!=0.0f&&current.coordinate.longitude!=0)&&(current_distance/total_distance)<0.5f) {
         [MBProgressHUD showAndHideWithMessage:@"还未到乘客下车点附近!" forHUD:nil];
         return;
     }else if((current.coordinate.latitude==0.0f&&current.coordinate.longitude==0)){

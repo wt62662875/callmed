@@ -38,6 +38,13 @@
         make.bottom.equalTo(self);
     }];
     
+    UIImageView *youImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"you"]];
+    [self addSubview:youImage];
+    [youImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self);
+        make.right.equalTo(self).offset(-20);
+    }];
+    
     [self setBackgroundColor:RGBHex(g_green)];
     _moneyLabel = [[UILabel alloc] init];
     [_moneyLabel setText:@"99999.00"];

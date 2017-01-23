@@ -26,6 +26,9 @@
     [self initData];
     //NOTICE_NEED_CHANGE_MYORDER
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeOrderList:) name:@"NOTICE_NEED_CHANGE_MYORDER" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeOrder:) name:@"NOTICE_NEED_CHANGE_MYORDERLIST" object:nil];
+
+    
 }
 
 - (void) initView
@@ -127,5 +130,9 @@
 - (void) changeOrderList:(NSNotification*)notice
 {
     [self buttonSwitch:self.buttonOrder];
+}
+- (void) changeOrder:(NSNotification*)notice
+{
+    [self buttonSwitch:self.buttonList];
 }
 @end

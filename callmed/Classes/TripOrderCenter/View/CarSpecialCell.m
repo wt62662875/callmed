@@ -15,12 +15,16 @@
 @property (nonatomic,strong) UIButton *buttonStatus;
 @property (nonatomic,strong) UIButton *buttonCall;
 @property (nonatomic,strong) UIButton *buttonNav;
+@property (nonatomic,strong) UILabel *time;
+@property (nonatomic,strong) UIButton *leftCall;
+@property (nonatomic,strong) UIButton *cancelButton;
+
 
 @property (nonatomic,strong) UIView *containerView;
 @property (nonatomic,strong) LeftIconLabel *beginLabel;
 @property (nonatomic,strong) LeftIconLabel *endLabel;
 @property (nonatomic,strong) UILabel *moneyLabel;
-@property (nonatomic,strong) UILabel *distanceLabel;
+//@property (nonatomic,strong) UILabel *distanceLabel;
 @end
 
 @implementation CarSpecialCell
@@ -37,127 +41,131 @@
 
 - (void) initView
 {
-    _timeLabel = [[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    [_timeLabel setTitle:@"2016-08-06 11:32:12"];
-    [_timeLabel setImageUrl:@"huang3"];
-    [_timeLabel setTitleFont:[UIFont systemFontOfSize:13]];
-    [self addSubview:_timeLabel];
-    [_timeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self).offset(5);
-        make.left.equalTo(self).offset(5);
-        make.height.mas_equalTo(25);
-        make.width.mas_equalTo(200);
-    }];
-    
-    _buttonStatus = [UIButton buttonWithType:UIButtonTypeCustom];
-
-    
-    [_buttonStatus.layer setCornerRadius:5];
-//    [_buttonStatus.layer setMasksToBounds:YES];
-    [_buttonStatus.layer setBorderWidth:1];
-    [_buttonStatus.layer setBorderColor:RGBHex(g_yellow).CGColor];
-    [_buttonStatus setTitleColor:RGBHex(g_yellow) forState:UIControlStateNormal];
-    [_buttonStatus.titleLabel setFont:[UIFont systemFontOfSize:12]];
-    [_buttonStatus setUserInteractionEnabled:NO];
-    [_buttonStatus setTitleEdgeInsets:UIEdgeInsetsMake(0, 10, 0, 10)];
-    
-    /*
-    [_buttonStatus.layer setBorderColor:RGBHex(g_green).CGColor];
-    [_buttonStatus setTitle:@"" forState:UIControlStateNormal];
-    [_buttonStatus setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];            //RGBHex(g_green)
-    [_buttonStatus setTitleColor:RGBHex(g_green) forState:UIControlStateSelected];     //RGBHex(g_green)
-    [_buttonStatus setTitleColor:RGBHex(g_green) forState:UIControlStateHighlighted];  //RGBHex(g_green)
-    [_buttonStatus.titleLabel setFont:[UIFont systemFontOfSize:15]];
-    [_buttonStatus setBackgroundImage:[ImageTools imageWithColor:RGBHex(g_green)] forState:UIControlStateNormal];
-    [_buttonStatus setBackgroundImage:[ImageTools imageWithColor:[UIColor whiteColor]] forState:UIControlStateSelected];
-    [_buttonStatus setBackgroundImage:[ImageTools imageWithColor:[UIColor whiteColor]] forState:UIControlStateHighlighted];
-     */
-    [_buttonStatus addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
-    [_buttonStatus.layer setCornerRadius:5];
-    [_buttonStatus.layer setMasksToBounds:YES];
-    [_buttonStatus.layer setBorderWidth:1];
-    [_buttonStatus setTag:1];
-    [self addSubview:_buttonStatus];
-    [_buttonStatus mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self).offset(5);
-        make.right.equalTo(self).offset(-10);
-        make.height.mas_equalTo(30);
-//        make.width.mas_lessThanOrEqualTo(130);
-    }];
-    
-    
-    _buttonNav = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_buttonNav.layer setCornerRadius:5];
-    [_buttonNav.layer setMasksToBounds:YES];
-    [_buttonNav.layer setBorderWidth:1];
-    [_buttonNav.layer setBorderColor:RGBHex(g_yellow).CGColor];
-    [_buttonNav.titleLabel setFont:[UIFont systemFontOfSize:12]];
-    [_buttonNav setTitleColor:RGBHex(g_yellow) forState:UIControlStateNormal];
-    [_buttonNav setTitle:@"导航" forState:UIControlStateNormal];
-    [_buttonNav setTitleEdgeInsets:UIEdgeInsetsMake(0, 10, 0, 10)];
-    
-    /*
-    [_buttonNav setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];            //RGBHex(g_green)
-    [_buttonNav setTitleColor:RGBHex(g_green) forState:UIControlStateSelected];     //RGBHex(g_green)
-    [_buttonNav setTitleColor:RGBHex(g_green) forState:UIControlStateHighlighted];  //RGBHex(g_green)
-    [_buttonNav.titleLabel setFont:[UIFont systemFontOfSize:15]];
-    [_buttonNav setBackgroundImage:[ImageTools imageWithColor:RGBHex(g_green)] forState:UIControlStateNormal];
-    [_buttonNav setBackgroundImage:[ImageTools imageWithColor:[UIColor whiteColor]] forState:UIControlStateSelected];
-    [_buttonNav setBackgroundImage:[ImageTools imageWithColor:[UIColor whiteColor]] forState:UIControlStateHighlighted];
-    */
-    [_buttonNav addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
-//    [_buttonNav.layer setCornerRadius:5];
-//    [_buttonNav.layer setMasksToBounds:YES];
-//    [_buttonNav.layer setBorderWidth:1];
-    [_buttonNav setTag:2];
-    [self addSubview:_buttonNav];
-    [_buttonNav mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self).offset(5);
-        make.right.equalTo(_buttonStatus.mas_left).offset(-10);
-        make.height.mas_equalTo(30);
-        make.width.mas_equalTo(60);
-    }];
-    
     _containerView = [[UIView alloc] init];
     [_containerView.layer setCornerRadius:5];
     [_containerView.layer setMasksToBounds:YES];
-    [_containerView setBackgroundColor:RGBHex(g_assit_gray_eee)];
+    [_containerView.layer setBorderWidth:1];
+    [_containerView.layer setBorderColor:[UIColor clearColor].CGColor];
+    [_containerView setBackgroundColor:[UIColor whiteColor]];
+    
     [self addSubview:_containerView];
     [_containerView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_buttonStatus.mas_bottom).offset(10);
+        make.top.equalTo(self).offset(10);
         make.left.equalTo(self).offset(30);
         make.right.equalTo(self).offset(-10);
         make.bottom.equalTo(self).offset(-10);
     }];
     
-    _distanceLabel =[[UILabel alloc] init];
-    [_distanceLabel setText:@"距离0.0公里"];
-    [_distanceLabel setFont:[UIFont systemFontOfSize:13]];
-    [_distanceLabel.layer setCornerRadius:10];
-    [_distanceLabel setTextAlignment:NSTextAlignmentCenter];
-    [_distanceLabel.layer setMasksToBounds:YES];
-    [_distanceLabel setTextColor:[UIColor whiteColor]];
-    [_distanceLabel setBackgroundColor:RGBHex(g_yellow)];
-    [_containerView addSubview:_distanceLabel];
-    [_distanceLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_containerView).offset(10);
+    _buttonStatus = [UIButton buttonWithType:UIButtonTypeCustom];
+    _buttonStatus.backgroundColor = RGBHex(g_yellow);
+    [_buttonStatus.layer setCornerRadius:5];
+    [_buttonStatus.layer setMasksToBounds:YES];
+    //    [_buttonStatus.layer setBorderWidth:1];
+    //    [_buttonStatus.layer setBorderColor:RGBHex(g_blue).CGColor];
+    [_buttonStatus.titleLabel setFont:[UIFont systemFontOfSize:12]];
+    [_buttonStatus setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [_buttonStatus setUserInteractionEnabled:NO];
+    [_buttonStatus addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_buttonStatus];
+    [_buttonStatus mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(_containerView.mas_centerX).offset(10);
+        make.right.equalTo(_containerView).offset(-10);
+        make.bottom.equalTo(_containerView.mas_bottom).offset(-10);
+        make.height.offset(35);
+    }];
+    
+    _buttonNav = [UIButton buttonWithType:UIButtonTypeCustom];
+    _buttonNav.backgroundColor = RGBHex(g_yellow);
+    [_buttonNav setTag:2];
+    [_buttonNav.layer setCornerRadius:5];
+    [_buttonNav.layer setMasksToBounds:YES];
+    [_buttonNav.titleLabel setFont:[UIFont systemFontOfSize:12]];
+    [_buttonNav setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [_buttonNav setTitle:@"导航" forState:UIControlStateNormal];
+    [_buttonNav addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_buttonNav];
+    [_buttonNav mas_makeConstraints:^(MASConstraintMaker *make) {
+        //        make.width.mas_equalTo(50);
+        //        make.height.mas_equalTo(30);
+        //        make.right.equalTo(_buttonStatus.mas_left).offset(-10);
+        //        make.top.equalTo(self).offset(5);
         make.left.equalTo(_containerView).offset(10);
-        make.height.mas_equalTo(20);
-        make.width.mas_equalTo(130);
+        make.right.equalTo(_containerView.mas_centerX).offset(-10);
+        make.bottom.equalTo(_containerView.mas_bottom).offset(-10);
+        make.height.offset(35);
+    }];
+    
+    UIView *blueView = [[UIView alloc]init];
+    [blueView setBackgroundColor:RGBHex(g_yellow)];
+    [_containerView addSubview:blueView];
+    [blueView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(_containerView);
+        make.right.equalTo(_containerView);
+        make.top.equalTo(_containerView);
+        make.height.offset(35);
+    }];
+    
+    _time = [[UILabel alloc]init];
+    _time.font = [UIFont systemFontOfSize:13];
+    [_time setTextColor:[UIColor whiteColor]];
+    [blueView addSubview:_time];
+    [_time mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(blueView).offset(5);
+        make.centerY.equalTo(blueView);
+    }];
+    
+    
+    _timeLabel = [[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    [_timeLabel setImageUrl:@"huang3"];
+    [_timeLabel setTitleFont:[UIFont systemFontOfSize:13]];
+    [self addSubview:_timeLabel];
+    [_timeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self).offset(10);
+        make.height.mas_equalTo(30);
+        make.right.equalTo(_buttonNav.mas_left);
+        make.top.equalTo(self);
+    }];
+
+    _leftCall = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_leftCall setBackgroundImage:[UIImage imageNamed:@"landian"] forState:UIControlStateNormal];
+    [_leftCall addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
+    [_containerView addSubview:_leftCall];
+    [_leftCall mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(blueView.mas_bottom).offset(30);
+        make.left.equalTo(_containerView).offset(30);
     }];
     
     _buttonCall = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_buttonCall setImage:[UIImage imageNamed:@"dianhua"] forState:UIControlStateNormal];
-    [_buttonCall setTitle:@"呼和浩特" forState:UIControlStateNormal];
-    [_buttonCall.titleLabel setFont:[UIFont systemFontOfSize:14]];
-    [_buttonCall setTitleColor:RGBHex(g_assit_c1) forState:UIControlStateNormal];
+    [_buttonCall setTitleColor:RGBHex(g_gray_54) forState:UIControlStateNormal];
+    [_buttonCall setTitle:@"" forState:UIControlStateNormal];
+    [_buttonCall.titleLabel setFont:[UIFont systemFontOfSize:15]];
     [_buttonCall addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
     [_containerView addSubview:_buttonCall];
     [_buttonCall mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_distanceLabel.mas_bottom).offset(5);
-        make.left.equalTo(_containerView).offset(10);
-        make.height.mas_equalTo(30);
+        make.height.mas_equalTo(25);
+        make.centerX.equalTo(_leftCall);
+        make.top.equalTo(_leftCall.mas_bottom).offset(10);
+        make.width.mas_greaterThanOrEqualTo(120);
+        make.width.mas_lessThanOrEqualTo(200);
     }];
+    
+//    _distanceLabel =[[UILabel alloc] init];
+//    [_distanceLabel setText:@"距离0.0公里"];
+//    [_distanceLabel setFont:[UIFont systemFontOfSize:13]];
+//    [_distanceLabel.layer setCornerRadius:10];
+//    [_distanceLabel setTextAlignment:NSTextAlignmentCenter];
+//    [_distanceLabel.layer setMasksToBounds:YES];
+//    [_distanceLabel setTextColor:[UIColor whiteColor]];
+//    [_distanceLabel setBackgroundColor:RGBHex(g_yellow)];
+//    [_containerView addSubview:_distanceLabel];
+//    [_distanceLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(_containerView).offset(10);
+//        make.left.equalTo(_containerView).offset(10);
+//        make.height.mas_equalTo(20);
+//        make.width.mas_equalTo(130);
+//    }];
+    
+
     
     _beginLabel = [[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     [_beginLabel setTitle:@"广东省广州市海伦春天"];
@@ -166,11 +174,10 @@
     [_beginLabel setPadding:10];
     [_containerView addSubview:_beginLabel];
     [_beginLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_buttonCall.mas_bottom).offset(5);
-        make.left.equalTo(_containerView).offset(10);
-        make.right.equalTo(_containerView).offset(-30);
-        make.height.mas_greaterThanOrEqualTo(20);
-        
+//        make.top.equalTo(blueView.mas_bottom);
+        make.centerY.equalTo(self).offset(-25);
+        make.left.equalTo(_leftCall.mas_right).offset(35);
+        make.height.mas_equalTo(30);
     }];
     
     _endLabel = [[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
@@ -180,27 +187,35 @@
     [_endLabel setPadding:10];
     [_containerView addSubview:_endLabel];
     [_endLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_beginLabel.mas_bottom).offset(10);
-        make.left.equalTo(_containerView).offset(10);
-        make.right.equalTo(_containerView).offset(-30);
-        make.height.mas_greaterThanOrEqualTo(20);
+//        make.top.equalTo(_beginLabel.mas_bottom);
+        make.centerY.equalTo(self).offset(25);
+        make.left.equalTo(_leftCall.mas_right).offset(35);
+        make.height.mas_equalTo(30);
     }];
     
     _moneyLabel = [[UILabel alloc] init];
     [_moneyLabel setText:@"￥"];
-    [_moneyLabel setTextColor:[UIColor redColor]];
+    [_moneyLabel setTextColor:[UIColor whiteColor]];
     [_moneyLabel setFont:[UIFont systemFontOfSize:15]];
     [_containerView addSubview:_moneyLabel];
     [_moneyLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        //make.bottom.equalTo(_containerView).offset(-10);
-        make.right.equalTo(_containerView).offset(-5);
-        make.height.mas_equalTo(30);
-        make.centerY.equalTo(_endLabel.mas_centerY);
+        make.centerY.equalTo(_time);
+        make.left.equalTo(_time.mas_right).offset(10);
     }];
     
+    _cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [_cancelButton setTitle:@"取消订单" forState:UIControlStateNormal];
+    _cancelButton.titleLabel.font = [UIFont systemFontOfSize:15];
+    [_cancelButton addTarget:self action:@selector(cancelButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+    [blueView addSubview:_cancelButton];
+    [_cancelButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(blueView);
+        make.right.equalTo(blueView).offset(-10);
+    }];
     
     UIView *view =[[UIView alloc] init];
-    [view setBackgroundColor:RGBHex(g_m_c)];
+    [view setBackgroundColor:RGBHex(g_yellow)];
     [self addSubview:view];
     [view mas_makeConstraints:^(MASConstraintMaker *make) {
         make.width.mas_equalTo(1);
@@ -220,12 +235,6 @@
     NSString *txt = [CommonUtility getDriverOrderDescription:_model.state];
     CGSize size = [txt sizeFont:15];
     [_buttonStatus setTitle:txt forState:UIControlStateNormal];
-    [_buttonStatus mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self).offset(5);
-        make.right.equalTo(self).offset(-10);
-        make.height.mas_equalTo(30);
-        make.width.mas_equalTo(size.width+20);
-    }];
    
     if ([@"3" isEqualToString:_model.state] || [@"4" isEqualToString:_model.state] || [@"5" isEqualToString:_model.state]) {
         [_buttonStatus setUserInteractionEnabled:YES];
@@ -233,28 +242,32 @@
         [_buttonStatus setUserInteractionEnabled:NO];
     }
     
-    [_buttonCall setTitle:[NSString stringWithFormat:@"%@ %@",_model.mRealName?_model.mRealName:@"",_model.mPhoneNo?_model.mPhoneNo:@""] forState:UIControlStateNormal];
+    [_buttonCall setTitle:model.mRealName?model.mRealName:model.mPhoneNo forState:UIControlStateNormal];
     
     if ([@"1" isEqualToString:_model.appoint])
     {
-        [_timeLabel setTitle:_model.appointDate];
+        _time.text = _model.appointDate;
     }else{
-        [_timeLabel setTitle:@"现在"];
+        _time.text = @"现在";
     }
     if ([@"4" isEqualToString:_model.type])
     {
-        [_timeLabel setTitle:_model.createDate];
+        _time.text = _model.createDate;
     }
-    
-    NSString *dist = [NSString stringWithFormat:@"距离%0.1f公里",[model.distance floatValue]/1000];
-    size = [dist sizeFont:13];
-    [_distanceLabel setText:dist];
-    [_distanceLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_containerView).offset(10);
-        make.left.equalTo(_containerView).offset(10);
-        make.height.mas_equalTo(20);
-        make.width.mas_equalTo(size.width+20);
-    }];
+    if ([@"2" isEqualToString:_model.state] ||[@"3" isEqualToString:_model.state] || [@"4" isEqualToString:_model.state]) {
+        _cancelButton.hidden = NO;
+    }else{
+        _cancelButton.hidden = YES;
+    }
+//    NSString *dist = [NSString stringWithFormat:@"距离%0.1f公里",[model.distance floatValue]/1000];
+//    size = [dist sizeFont:13];
+//    [_distanceLabel setText:dist];
+//    [_distanceLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(_containerView).offset(10);
+//        make.left.equalTo(_containerView).offset(10);
+//        make.height.mas_equalTo(20);
+//        make.width.mas_equalTo(size.width+20);
+//    }];
     
     [_beginLabel setTitle:model.slocation];
     
@@ -289,10 +302,15 @@
 
     // Configure the view for the selected state
 }
-
+-(void)cancelButtonClick:(UIButton *)button{
+    if ((_delegate && [_delegate respondsToSelector:@selector(valueChanged:)])) {
+        [_delegate valueChanged:_model];
+    }
+    
+}
 - (void) buttonTarget:(id)sender
 {
-    if (sender == _buttonCall) {
+    if (sender == _buttonCall || sender == _leftCall) {
         
         [CommonUtility callTelphone:_model.mPhoneNo];
         return;

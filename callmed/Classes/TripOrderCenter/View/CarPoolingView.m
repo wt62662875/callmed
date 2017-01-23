@@ -30,7 +30,7 @@
 
 
 @property (nonatomic,strong) LeftIconLabel *peopleLabel;
-@property (nonatomic,strong) LeftIconLabel *feeLabel;
+//@property (nonatomic,strong) LeftIconLabel *feeLabel;
 @property (nonatomic,strong) LeftIconLabel *remarkLabel;
 @property (nonatomic,strong) UIButton *routePlanLine;//规划线路
 @end
@@ -213,17 +213,17 @@
         make.right.equalTo(_containerView).offset(-10);
     }];
     
-    _feeLabel = [[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    [_feeLabel setTitle:@"0元"];
-    [_feeLabel setImageUrl:@"￥"];
-    [_feeLabel setTitleFont:[UIFont systemFontOfSize:15]];
-    [_feeLabel setPadding:10];
-    [_containerView addSubview:_feeLabel];
-    [_feeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_peopleLabel.mas_bottom).offset(5);
-        make.left.equalTo(_containerView).offset(10);
-        make.right.equalTo(_containerView).offset(-10);
-    }];
+//    _feeLabel = [[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+//    [_feeLabel setTitle:@"0元"];
+//    [_feeLabel setImageUrl:@"￥"];
+//    [_feeLabel setTitleFont:[UIFont systemFontOfSize:15]];
+//    [_feeLabel setPadding:10];
+//    [_containerView addSubview:_feeLabel];
+//    [_feeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(_peopleLabel.mas_bottom).offset(5);
+//        make.left.equalTo(_containerView).offset(10);
+//        make.right.equalTo(_containerView).offset(-10);
+//    }];
     
     _remarkLabel = [[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     [_remarkLabel setTitle:@""];
@@ -232,7 +232,7 @@
     [_remarkLabel setPadding:10];
     [_containerView addSubview:_remarkLabel];
     [_remarkLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_feeLabel.mas_bottom).offset(0);
+        make.top.equalTo(_peopleLabel.mas_bottom).offset(0);
         make.left.equalTo(_containerView).offset(10);
         make.right.equalTo(_containerView).offset(-10);
         make.height.mas_greaterThanOrEqualTo(25);
@@ -317,12 +317,12 @@
     [_startLabel setTitle:model.slocation];
     [_endLabel setTitle:model.elocation];
     [_peopleLabel setTitle:[NSString stringWithFormat:@"%@人",model.orderPerson?model.orderPerson:@"0"]];
-    if (!model.otherFee||[@"0" isEqualToString:model.otherFee]) {
-        [_feeLabel setHidden:NO];
-    }else{
-        [_feeLabel setHidden:NO];
-        [_feeLabel setTitle:[NSString stringWithFormat:@"%@元",model.otherFee]];
-    }
+//    if (!model.otherFee||[@"0" isEqualToString:model.otherFee]) {
+//        [_feeLabel setHidden:NO];
+//    }else{
+//        [_feeLabel setHidden:NO];
+//        [_feeLabel setTitle:[NSString stringWithFormat:@"%@元",model.otherFee]];
+//    }
     
     if (!model.descriptions || [model.descriptions length]==0) {
         [_remarkLabel setHidden:NO];

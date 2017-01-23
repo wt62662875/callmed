@@ -8,6 +8,7 @@
 
 #import "UserInComeController.h"
 #import "OrderListController.h"
+#import "allOrderViewController.h"
 
 
 #import "UserCenterHeaderCell.h"
@@ -69,7 +70,6 @@
 
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-
     return 1;
 }
 
@@ -202,6 +202,12 @@
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if (indexPath.section == 0) {
+        allOrderViewController *allOrderVC = [[allOrderViewController alloc]initWithNibName:@"allOrderViewController" bundle:nil];
+        [allOrderVC setAccountId:_accountId];
+        [allOrderVC setBalance:[NSString stringWithFormat:@"%@",[_dictionary objectForKey:@"cmmoney"]]];
+        [self.navigationController pushViewController:allOrderVC animated:YES];
+    }
     if (indexPath.section==2) {
 //        [CommonUtility callTelphone:[GlobalData sharedInstance].user.userInfo.serviceNo];
     }

@@ -12,6 +12,7 @@
 #import "BalanceController.h"
 #import "MapNavController.h"
 #import "OrderDistance.h"
+#import "UIAlertView+Blocks.h"
 
 @interface TripOneController()<UITableViewDataSource,UITableViewDelegate,TargetActionDelegate,CallBackDelegate>
 
@@ -89,7 +90,7 @@
     if (!cell) {
         cell = [[CarSpecialCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellid];
     }
-   
+    cell.backgroundColor = RGBHex(g_assit_gray_eee);
     OrderModel *model = _dataArray[indexPath.section];
     [cell setDelegate:self];
     [cell setModel:model];
@@ -225,7 +226,24 @@
         }
     }
 }
+-(void)valueChanged:(id)sender{
+    OrderModel *model = (OrderModel*)sender;
+    [UIAlertView showWithTitle:@"温馨提示" message:@"是否取消订单" style:UIAlertViewStyleDefault cancelButtonTitle:@"取消" otherButtonTitles:@[@"确定"] tapBlock:^(UIAlertView * _Nonnull alertView, NSInteger buttonIndex) {
+        if (buttonIndex) {
+            NSLog(@"%@",model);
+            NSDictionary *params = [[NSDictionary alloc]initWithObjectsAndKeys:model.ids,@"id",model.driverId,@"driverId",@"司机取消",@"cancelReason", nil];
+            [HttpShareEngine callWithFormParams:params withMethod:@"cancelOrder" succ:^(NSDictionary *resultDictionary) {
+                NSLog(@"resultDictionary:%@",resultDictionary);
+                [_mTableView.mj_header beginRefreshing];
+                
+            } fail:^(NSInteger errorCode, NSString *errorMessage) {
+                NSLog(@"errorMessage:%@",errorMessage);
+                [MBProgressHUD showAndHideWithMessage:errorMessage forHUD:nil];
 
+            }];
+        }
+    }];
+}
 
 #pragma mark -CallBackDelegate
 

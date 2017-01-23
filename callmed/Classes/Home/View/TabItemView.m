@@ -85,10 +85,10 @@
     _isSelected = isSelected;
     if (_isSelected) {
         [_iconView setImage:[UIImage imageNamed:_imageUrlSelect]];
-        [_titleLabel setTextColor:RGBHex(g_red)];
+        [_titleLabel setTextColor:[UIColor whiteColor]];
     }else{
         [_iconView setImage:[UIImage imageNamed:_imageUrlNormal]];
-        [_titleLabel setTextColor:RGBHex(g_gray)];
+        [_titleLabel setTextColor:[UIColor whiteColor]];
     }
 }
 

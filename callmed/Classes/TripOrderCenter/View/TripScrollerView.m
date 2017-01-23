@@ -213,6 +213,31 @@
 
 - (void) setSelectIndex:(NSInteger)selectIndex
 {
+    for (UIView *view in self.subviews) {
+        if ([view isKindOfClass:[UIButton class]])
+        {
+            UIButton *btn = (UIButton*)view;
+            if (selectIndex == 0) {
+                if (btn.tag == 0) {
+                    [btn setTitleColor:RGBHex(g_yellow) forState:UIControlStateNormal];
+                }else{
+                    [btn setTitleColor:RGBHex(g_black) forState:UIControlStateNormal];
+                }
+                _backImageView.hidden = NO;
+                _backImageView2.hidden = YES;
+                //                [btn setBackgroundImage:nil forState:UIControlStateNormal];
+            }else{
+                if (btn.tag == 0) {
+                    [btn setTitleColor:RGBHex(g_black) forState:UIControlStateNormal];
+                }else{
+                    [btn setTitleColor:RGBHex(g_blue) forState:UIControlStateNormal];
+                }
+                _backImageView.hidden = YES;
+                _backImageView2.hidden = NO;
+                //                [btn setBackgroundImage:[UIImage imageNamed:@"yuanjiao6"] forState:UIControlStateNormal];
+            }
+        }
+    }
     _selectIndex = selectIndex;
     //    [self startAnimation:_redlineView withTag:selectIndex];
     if (_delegate && [_delegate respondsToSelector:@selector(buttonSelectedIndex:)])

@@ -69,9 +69,18 @@
         make.height.mas_equalTo(50);
         make.width.equalTo(self.view);
     }];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(outCarJump2:) name:@"outCarJump2" object:nil];
     
 }
+-(void)outCarJump2:(NSNotification*)aNotification{
+    NSString *str = [aNotification object];
+    [_tripView setSelectIndex:[str intValue]];
+    [self buttonSelectedIndex:[str intValue]];
 
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NOTICE_NEED_CHANGE_MYORDERLIST" object:nil];
+
+    
+}
 - (void) buttonTarget:(id)sender
 {
     

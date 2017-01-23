@@ -133,12 +133,13 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if ([@"1" isEqualToString:[GlobalData sharedInstance].user.userInfo.passed]) {
         CarStatusModel *model = _dataArray[indexPath.section];
+        
         if (model.status==0) {
             model.status = 1;
         }else{
             model.status = 0;
         }
-        [self changeCarStatusWithModel:model];
+        [self changeCarStatusWithModel:model section:indexPath.section];
     }else{
         [MBProgressHUD showAndHideWithDetail:@"审核未通过，暂不能出车，请完善你的个人信息！" forHUD:nil];
     }
@@ -180,12 +181,16 @@
 }
 */
 
-- (void) changeCarStatusWithModel:(CarStatusModel*)model
+- (void) changeCarStatusWithModel:(CarStatusModel*)model section:(NSInteger)section
 {
+
     MBProgressHUD *pub = [MBProgressHUD showProgressView:@"请稍后..." inView:nil];
     [pub show:YES];
     [CarStatusModel driverUpdateStatusType:model.type status:model.status success:^(NSDictionary *resultDictionary) {
-        
+        if (model.status == 1) {
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"outCarJump" object:[NSString stringWithFormat:@"%ld",(long)section]];
+        }
+
         [[GlobalData sharedInstance].user.userInfo setType:model.type];
         [[GlobalData sharedInstance].user.userInfo setReady:[NSString stringWithFormat:@"%ld",(long)model.status]];
         [[GlobalData sharedInstance].user save];

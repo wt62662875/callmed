@@ -1,16 +1,18 @@
 {
-  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "d41ec12f-28fd-4d3f-be65-af76b72055dd++7348",
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "908E10C441B96E6B7B4054426E5A123EF988A20F",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
-    "d41ec12f-28fd-4d3f-be65-af76b72055dd++7348" : {
-
+    "908E10C441B96E6B7B4054426E5A123EF988A20F" : {
+      "DVTSourceControlWorkingCopyRepositoryBranchesLocationKey" : "callme_ios\/branches",
+      "DVTSourceControlWorkingCopyRepositoryTagsLocationKey" : "callme_ios\/tags",
+      "DVTSourceControlWorkingCopyRepositoryPrimaryBranchLocationKey" : "callme_ios\/trunk"
     }
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
-    "d41ec12f-28fd-4d3f-be65-af76b72055dd++7348" : 9223372036854775807
+    "908E10C441B96E6B7B4054426E5A123EF988A20F" : 9223372036854775807
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "38ED7387-8619-4BBF-A21A-71801EDC400E",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "d41ec12f-28fd-4d3f-be65-af76b72055dd++7348" : "callmed\/"
+    "908E10C441B96E6B7B4054426E5A123EF988A20F" : "callmed\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "callmed",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
@@ -19,7 +21,7 @@
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "http:\/\/115.29.202.163\/svn",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "d41ec12f-28fd-4d3f-be65-af76b72055dd++7348"
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "908E10C441B96E6B7B4054426E5A123EF988A20F"
     }
   ]
 }

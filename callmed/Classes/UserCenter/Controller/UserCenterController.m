@@ -165,7 +165,7 @@
     _md_bank_name = [[InputModel alloc] init];
     _md_bank_name.index = 12;
     _md_bank_name.title = @"开户银行名称";
-    _md_bank_name.placeHolder=@"请具体到开户银行分行名称";
+    _md_bank_name.placeHolder=@"例如：中国农业银行";
     _md_bank_name.value = [GlobalData sharedInstance].user.userInfo.bankName;
     _md_bank_name.hasMore = (([GlobalData sharedInstance].user.userInfo.bankName&&[[GlobalData sharedInstance].user.userInfo.bankName length]>0))?NO:YES;
     
