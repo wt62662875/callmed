@@ -24,7 +24,7 @@
     self.view.backgroundColor = RGBHex(g_assit_gray);
     self.headerView.backgroundColor = [UIColor whiteColor];
     // Do any additional setup after loading the view from its nib.
-    [_mTableView setBackgroundColor:RGBHex(g_gray)];
+    [_mTableView setBackgroundColor:RGBHex(g_assit_gray)];
     _mTableView.mj_header =[MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [self fetchData];
     }];
