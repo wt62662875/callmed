@@ -69,7 +69,7 @@
         make.left.equalTo(self).offset(10);
         make.right.equalTo(self).offset(-10);
 //        make.height.mas_equalTo(300);
-        make.height.mas_greaterThanOrEqualTo(200);
+        make.height.mas_greaterThanOrEqualTo(210);
     }];
     
     _top_containerView = [[UIView alloc] init];
@@ -101,16 +101,6 @@
         make.height.mas_equalTo(30);
     }];
     
-    _moneyLabel = [[UILabel alloc] init];
-    [_moneyLabel setText:@"￥123.15"];
-    [_moneyLabel setTextColor:[UIColor whiteColor]];
-    [_top_containerView addSubview:_moneyLabel];
-    [_moneyLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerY.equalTo(_top_containerView);
-        make.right.equalTo(_top_containerView).offset(-10);
-        make.height.mas_equalTo(30);
-    }];
-    
     
     _distanceLabel =[[UILabel alloc] init];
     [_distanceLabel setText:@"距离1.5公里"];
@@ -124,8 +114,18 @@
     [_distanceLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(_top_containerView.mas_bottom).offset(10);
         make.left.equalTo(_top_containerView).offset(10);
-        make.height.mas_equalTo(20);
+        make.height.mas_equalTo(30);
         make.width.mas_equalTo(100);
+    }];
+    
+    _moneyLabel = [[UILabel alloc] init];
+    [_moneyLabel setText:@"￥123.15"];
+    [_moneyLabel setTextColor:RGBHex(g_blue)];
+    [_top_containerView addSubview:_moneyLabel];
+    [_moneyLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(_distanceLabel);
+        make.right.equalTo(_top_containerView).offset(-10);
+        make.height.mas_equalTo(30);
     }];
     
     _userView =[[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
@@ -297,6 +297,17 @@
         make.bottom.equalTo(_containerView).offset(-10);
         make.right.equalTo(_containerView).offset(-20);
     }];
+    
+    UIButton *closeView = [UIButton buttonWithType:UIButtonTypeCustom];
+    [closeView setImage:[UIImage imageNamed:@"guanbi"] forState:UIControlStateNormal];
+    [closeView setTag:6];
+    [closeView addTarget:self action:@selector(buttonTarget:) forControlEvents:(UIControlEventTouchUpInside)];
+    [_containerView addSubview:closeView];
+    [closeView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(_timeLabel);
+        make.right.equalTo(_top_containerView).offset(-10);
+    }];
+    
 }
 
 - (void) setModel:(OrderModel *)model

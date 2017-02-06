@@ -25,9 +25,11 @@
     self.headerView.backgroundColor = [UIColor whiteColor];
     // Do any additional setup after loading the view from its nib.
     [_mTableView setBackgroundColor:RGBHex(g_assit_gray)];
-    _mTableView.mj_header =[MJRefreshNormalHeader headerWithRefreshingBlock:^{
+//    _mTableView.mj_header =[MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [self fetchData];
-    }];
+//    }];
+//    [_mTableView.mj_header beginRefreshing];
+
 }
 #pragma mark - UITableViewDataSource
 
@@ -37,7 +39,7 @@
 }
 - (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 200;
+    return 240;
 }
 - (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 { static NSString *user_header_id = @"user_header_id_middle";

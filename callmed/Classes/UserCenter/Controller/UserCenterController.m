@@ -312,9 +312,6 @@
         }
 
         [self.navigationController popViewControllerAnimated:YES];
-    }else if(sender ==self.rightButton){
-//        [[GlobalData sharedInstance].user logout];
-//        [self.navigationController popToRootViewControllerAnimated:YES];
     }else if([sender isKindOfClass:[VerticalView class]]){
         
         NSInteger tag =((VerticalView*)sender).tag;

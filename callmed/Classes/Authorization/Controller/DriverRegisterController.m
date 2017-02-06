@@ -117,7 +117,7 @@
     
     
     _buttonApply =[UIButton buttonWithType:UIButtonTypeCustom];
-    [_buttonApply setEnabled:YES];
+//    [_buttonApply setEnabled:YES];
     [_buttonApply setTitle:@"同意条款并确认申请" forState:UIControlStateNormal];
     [_buttonApply.titleLabel setFont:[UIFont systemFontOfSize:14]];
     [_buttonApply setTitleColor:RGBHex(g_m_c) forState:UIControlStateNormal];

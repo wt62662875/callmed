@@ -38,7 +38,6 @@
             break;
         case 1:
             [CommonUtility callTelphone:[GlobalData sharedInstance].user.userInfo.serviceNo];
-
             break;
         case 2:
             [brower setTitleStr:@"使用指南"];

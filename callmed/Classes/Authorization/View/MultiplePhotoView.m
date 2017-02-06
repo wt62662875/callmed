@@ -109,13 +109,33 @@
 - (void) setDataArray:(NSArray *)dataArray
 {
     _dataArray = dataArray;
+    NSString *ids = [GlobalData sharedInstance].user.userInfo.ids;
+
     for (int i =0;i<_dataArray.count;i++) {
         NSString *title = _dataArray[i];
         PhotoTitleView *view = [self viewWithTag:i+100];
         if (view&&[view isKindOfClass:[PhotoTitleView class]]) {
             [view setTitle:title];
         }
+        switch (i) {
+            case 0:
+                [view setImageUrl:[CommonUtility driverPictureUrl:ids withType:@"1"]];
+                break;
+            case 1:
+                [view setImageUrl:[CommonUtility driverPictureUrl:ids withType:@"2"]];
+                break;
+            case 2:
+                [view setImageUrl:[CommonUtility driverPictureUrl:ids withType:@"3"]];
+                break;
+            case 3:
+                [view setImageUrl:[CommonUtility driverPictureUrl:ids withType:@"4"]];
+                break;
+            default:
+                break;
+        }
     }
+    
+    
     [self layoutIfNeeded];
 }
 

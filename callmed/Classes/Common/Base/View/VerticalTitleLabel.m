@@ -12,6 +12,7 @@
 
 @property (nonatomic,strong) UILabel *titleLabel;
 @property (nonatomic,strong) UILabel *contentLabel;
+@property (nonatomic,strong) UIImageView * imageView;
 
 @end
 
@@ -28,24 +29,34 @@
 
 - (void) initView
 {
+    _imageView = [[UIImageView alloc]init];
+    [self addSubview:_imageView];
+    [_imageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self).offset(10);
+        make.centerX.equalTo(self);
+//        make.width.equalTo(self);
+//        make.bottom.equalTo(self.mas_centerY).offset(-5);
+    }];
+    
     _titleLabel =[[UILabel alloc] init];
     _titleLabel.textAlignment = NSTextAlignmentCenter;
     [self addSubview:_titleLabel];
     [_titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self).offset(5);
+        make.top.equalTo(_imageView.mas_bottom).offset(5);
         make.centerX.equalTo(self);
         make.width.equalTo(self);
-        make.bottom.equalTo(self.mas_centerY).offset(-5);
+//        make.bottom.equalTo(self.mas_centerY).offset(-5);
     }];
     
     _contentLabel = [[UILabel alloc] init];
     _contentLabel.textAlignment = NSTextAlignmentCenter;
+    _contentLabel.textColor = RGBHex(@"#999999");
     
     [self addSubview:_contentLabel];
     [_contentLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(_titleLabel.mas_bottom);
         make.centerX.equalTo(self);
-        make.bottom.equalTo(self);
+//        make.bottom.equalTo(self);
         make.width.equalTo(self);
     }];
 }
@@ -57,6 +68,16 @@
     // Drawing code
 }
 */
+- (void) setImageName:(NSString *)imageName{
+    _imageName = imageName;
+    [_imageView setImage:[UIImage imageNamed:imageName]];
+//    [_titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(_imageView.mas_bottom).offset(5);
+//        make.centerX.equalTo(self);
+//        make.width.equalTo(self);
+//        make.bottom.equalTo(self.mas_centerY).offset(-5);
+//    }];
+}
 
 - (void) setTitle:(NSString *)title
 {

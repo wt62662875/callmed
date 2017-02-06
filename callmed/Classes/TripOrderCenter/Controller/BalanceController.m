@@ -268,10 +268,10 @@
 
     
     
-    if ((current.coordinate.latitude!=0.0f&&current.coordinate.longitude!=0)&&(current_distance/total_distance)<0.5f) {
+    if ((current.coordinate.latitude!=0.0f&&current.coordinate.longitude!=0)&&(current_distance/total_distance)<0.5f && [_model.type isEqualToString:@"2"]) {
         [MBProgressHUD showAndHideWithMessage:@"还未到乘客下车点附近!" forHUD:nil];
         return;
-    }else if((current.coordinate.latitude==0.0f&&current.coordinate.longitude==0)){
+    }else if((current.coordinate.latitude==0.0f&&current.coordinate.longitude==0) && [_model.type isEqualToString:@"2"]){
         [MBProgressHUD showAndHideWithMessage:@"还未获得定位信息!无法结束行程." forHUD:nil];
         return;
     }
@@ -310,6 +310,7 @@
         }
     }
     NSLog(@"params:%@",params);
+
     [OrderModel driverOverTrip:params succes:^(NSDictionary *resultDictionary) {
         NSLog(@"result:%@",resultDictionary);
         [[GlobalData sharedInstance].dictDistance removeObjectForKey:_model.ids];

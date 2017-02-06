@@ -42,19 +42,20 @@
 - (void) initView
 {
     UIView *lineView1 = [[UIView alloc]init];
-    lineView1.backgroundColor = RGBHex(g_gray);
+    lineView1.backgroundColor = RGBHex(g_assit_gray);
     [self addSubview:lineView1];
     [lineView1 mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self);
         make.left.equalTo(self);
         make.right.equalTo(self);
-        make.height.mas_equalTo(5);
+        make.height.mas_equalTo(0);
     }];
 
     
     _estamiteLabel = [[VerticalTitleLabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    [_estamiteLabel setImageName:@"xingji"];
     [_estamiteLabel setTitle:@"4.5"];
-    [_estamiteLabel setContent:@"评分"];
+    [_estamiteLabel setContent:@"评价星级"];
     [_estamiteLabel setTitleFont:[UIFont systemFontOfSize:20]];
     [_estamiteLabel setTitleColor:[UIColor blackColor]];
     [_estamiteLabel setContentFont:[UIFont systemFontOfSize:12]];
@@ -62,29 +63,31 @@
     
     
     _distanceLabel = [[VerticalTitleLabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    [_distanceLabel setImageName:@"xingch"];
     [_distanceLabel setTitle:@"30"];
-    [_distanceLabel setContent:@"千米"];
+    [_distanceLabel setContent:@"我的行程"];
     [_distanceLabel setTitleFont:[UIFont systemFontOfSize:20]];
     [_distanceLabel setTitleColor:[UIColor blackColor]];
     [_distanceLabel setContentFont:[UIFont systemFontOfSize:12]];
     [self addSubview:_distanceLabel];
     
     [_estamiteLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(lineView1.mas_bottom).offset(10);
+        make.top.equalTo(lineView1.mas_bottom);
         make.left.equalTo(self);
         make.right.equalTo(_distanceLabel.mas_left);
-        make.height.mas_equalTo(50);
+        make.height.mas_equalTo(90);
     }];
     
     [_distanceLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(lineView1.mas_bottom).offset(10);
+        make.top.equalTo(lineView1.mas_bottom);
         make.left.equalTo(_estamiteLabel.mas_right);
         make.width.equalTo(_estamiteLabel.mas_width);
         make.centerX.equalTo(self.mas_centerX);
-        make.height.mas_equalTo(50);
+        make.height.mas_equalTo(90);
     }];
     
     _successRateLabel = [[VerticalTitleLabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    [_successRateLabel setImageName:@"chengjiao"];
     [_successRateLabel setTitle:@"98%"];
     [_successRateLabel setContent:@"成交率"];
     [_successRateLabel setTitleFont:[UIFont systemFontOfSize:20]];
@@ -92,15 +95,15 @@
     [_successRateLabel setContentFont:[UIFont systemFontOfSize:12]];
     [self addSubview:_successRateLabel];
     [_successRateLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(lineView1.mas_bottom).offset(10);
+        make.top.equalTo(lineView1.mas_bottom);
         make.left.equalTo(_distanceLabel.mas_right);
         make.width.equalTo(_distanceLabel.mas_width);
         make.right.mas_equalTo(self);
-        make.height.mas_equalTo(50);
+        make.height.mas_equalTo(90);
     }];
     
     UIView *lineView2 = [[UIView alloc]init];
-    lineView2.backgroundColor = RGBHex(g_gray);
+    lineView2.backgroundColor = RGBHex(g_assit_gray);
     [self addSubview:lineView2];
     [lineView2 mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(_successRateLabel.mas_bottom).offset(10);
@@ -111,7 +114,7 @@
     
     
     UIView *lineone = [[UIView alloc] init];
-    [lineone setBackgroundColor:RGBHex(g_gray)];
+    [lineone setBackgroundColor:RGBHex(g_assit_gray)];
     [self addSubview:lineone];
     [lineone mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self);

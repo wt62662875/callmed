@@ -9,7 +9,7 @@
 #import "chooseCompanyViewController.h"
 #import "chooseCompanyTableViewCell.h"
 
-@interface chooseCompanyViewController ()<UITextFieldDelegate>
+@interface chooseCompanyViewController ()<UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource>
 {
     NSArray *datasArray;
 }
@@ -30,11 +30,46 @@
 
     // Do any additional setup after loading the view from its nib.
     
-    [self getDatas:@""];
+    [self getTree:@"分公司"];
 }
+-(void)getTree:(NSString *)name{
+    [MBProgressHUD showAndHideWithMessage:@"正在加载数据中....." forHUD:nil];
+    
+    NSDictionary *params = [[NSDictionary alloc]initWithObjectsAndKeys:name,@"name",nil];
+    [HttpShareEngine callWithFormParams:params withMethod:@"getDepartmentTree" succ:^(NSDictionary *resultDictionary) {
+        NSLog(@"%@",resultDictionary);
+        datasArray = [[NSArray alloc]initWithArray:[resultDictionary objectForKey:@"rows"]];
+        [_tableView reloadData];
+        
+    } fail:^(NSInteger errorCode, NSString *errorMessage) {
+        [MBProgressHUD showAndHideWithMessage:@"系统繁忙，请稍后再试..." forHUD:nil];
+    }];
+    
+    [MBProgressHUD showAndHideWithMessage:@"正在加载数据中....." forHUD:nil];
+}
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return datasArray.count;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    return 40;
+}
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+    UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenSize.width, 40)];
+    view.backgroundColor = RGBHex(g_assit_gray);
+
+    UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(8, 0, 300, 30)];
+    label.font = [UIFont systemFontOfSize:15];
+    label.textColor = [UIColor grayColor];
+    label.text = [datasArray[section] objectForKey:@"shortName"];
+    [view addSubview:label];
+    
+    return view;
+}
+
 #pragma mark CELL的row数量
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return datasArray.count;
+    NSArray *temp =[datasArray[section] objectForKey:@"children"];
+    return temp.count;
 }
 #pragma mark CELL的高度
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -50,44 +85,44 @@
         cell = [[NSBundle mainBundle] loadNibNamed:@"chooseCompanyTableViewCell" owner:self options:nil][0];
     }
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-    cell.nameLabel.text = [datasArray[indexPath.row] objectForKey:@"name"];
+    cell.nameLabel.text = [[datasArray[indexPath.section] objectForKey:@"children"][indexPath.row] objectForKey:@"name"];
     
     return cell;
 }
 
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    [self.delegate getCompanyDatas:datasArray[indexPath.row]];
+    [self.delegate getCompanyDatas:[datasArray[indexPath.section] objectForKey:@"children"][indexPath.row]];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
--(void)getDatas:(NSString *)name{
-    [MBProgressHUD showAndHideWithMessage:@"正在加载数据中....." forHUD:nil];
-    
-    NSDictionary *params = [[NSDictionary alloc]initWithObjectsAndKeys:@"1", @"page",@"100",@"pageSize",name,@"name",nil];
-    [HttpShareEngine callWithFormParams:params withMethod:@"listDepartment" succ:^(NSDictionary *resultDictionary) {
-        NSLog(@"%@",resultDictionary);
-        datasArray = [[NSArray alloc]initWithArray:[resultDictionary objectForKey:@"rows"]];
-        [_tableView reloadData];
-        
-    } fail:^(NSInteger errorCode, NSString *errorMessage) {
-        [MBProgressHUD showAndHideWithMessage:@"系统繁忙，请稍后再试..." forHUD:nil];
-    }];
-
-    [MBProgressHUD showAndHideWithMessage:@"正在加载数据中....." forHUD:nil];
-    
-//    NSDictionary *params = [[NSDictionary alloc]initWithObjectsAndKeys:@"1",@"type",nil];
-//    [HttpShareEngine callWithFormParams:params withMethod:@"getDepartmentTree" succ:^(NSDictionary *resultDictionary) {
+//-(void)getDatas:(NSString *)name{
+//    [MBProgressHUD showAndHideWithMessage:@"正在加载数据中....." forHUD:nil];
+//    
+//    NSDictionary *params = [[NSDictionary alloc]initWithObjectsAndKeys:@"1", @"page",@"100",@"pageSize",name,@"name",nil];
+//    [HttpShareEngine callWithFormParams:params withMethod:@"listDepartment" succ:^(NSDictionary *resultDictionary) {
 //        NSLog(@"%@",resultDictionary);
-//        
+//        datasArray = [[NSArray alloc]initWithArray:[resultDictionary objectForKey:@"rows"]];
+//        [_tableView reloadData];
 //        
 //    } fail:^(NSInteger errorCode, NSString *errorMessage) {
 //        [MBProgressHUD showAndHideWithMessage:@"系统繁忙，请稍后再试..." forHUD:nil];
 //    }];
-}
+//
+//    [MBProgressHUD showAndHideWithMessage:@"正在加载数据中....." forHUD:nil];
+//    
+////    NSDictionary *params = [[NSDictionary alloc]initWithObjectsAndKeys:@"1",@"type",nil];
+////    [HttpShareEngine callWithFormParams:params withMethod:@"getDepartmentTree" succ:^(NSDictionary *resultDictionary) {
+////        NSLog(@"%@",resultDictionary);
+////        
+////        
+////    } fail:^(NSInteger errorCode, NSString *errorMessage) {
+////        [MBProgressHUD showAndHideWithMessage:@"系统繁忙，请稍后再试..." forHUD:nil];
+////    }];
+//}
 
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField{
-    [self getDatas:_textField.text];
+    [self getTree:_textField.text];
     [textField resignFirstResponder];
     return YES;
 }
@@ -96,7 +131,7 @@
     if (self.leftButton == sender) {
         [self.navigationController popViewControllerAnimated:YES];
     }else{
-        [self getDatas:_textField.text];
+        [self getTree:_textField.text];
     }
 }
 

@@ -127,7 +127,7 @@
     }];
 
     _leftCall = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_leftCall setBackgroundImage:[UIImage imageNamed:@"landian"] forState:UIControlStateNormal];
+    [_leftCall setBackgroundImage:[UIImage imageNamed:@"dianhua"] forState:UIControlStateNormal];
     [_leftCall addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
     [_containerView addSubview:_leftCall];
     [_leftCall mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -232,6 +232,13 @@
 - (void) setModel:(OrderModel *)model
 {
     _model = model;
+    if ([_model.state isEqualToString:@"6"]) {
+        _buttonStatus.backgroundColor = [UIColor whiteColor];
+        [_buttonStatus setTitleColor:RGBHex(g_yellow) forState:UIControlStateNormal];
+    }else{
+        _buttonStatus.backgroundColor = RGBHex(g_yellow);
+        [_buttonStatus setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    }
     NSString *txt = [CommonUtility getDriverOrderDescription:_model.state];
     CGSize size = [txt sizeFont:15];
     [_buttonStatus setTitle:txt forState:UIControlStateNormal];

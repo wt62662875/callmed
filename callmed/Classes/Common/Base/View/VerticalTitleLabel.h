@@ -11,6 +11,8 @@
 @interface VerticalTitleLabel : UIView
 @property (nonatomic,copy) NSString *title;
 @property (nonatomic,copy) NSString *content;
+@property (nonatomic,copy) NSString *imageName;
+
 @property (nonatomic,strong) UIColor *titleColor;
 @property (nonatomic,strong) UIColor *contentColor;
 @property (nonatomic,strong) UIFont *titleFont;

@@ -187,14 +187,13 @@
     MBProgressHUD *pub = [MBProgressHUD showProgressView:@"请稍后..." inView:nil];
     [pub show:YES];
     [CarStatusModel driverUpdateStatusType:model.type status:model.status success:^(NSDictionary *resultDictionary) {
-        if (model.status == 1) {
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"outCarJump" object:[NSString stringWithFormat:@"%ld",(long)section]];
-        }
 
         [[GlobalData sharedInstance].user.userInfo setType:model.type];
         [[GlobalData sharedInstance].user.userInfo setReady:[NSString stringWithFormat:@"%ld",(long)model.status]];
         [[GlobalData sharedInstance].user save];
-        
+        if (model.status == 1) {
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"outCarJump" object:[NSString stringWithFormat:@"%ld",(long)section]];
+        }
         [pub hide:YES];
         [self.mTableView reloadData];
     } failed:^(NSInteger errorCode, NSString *errorMessage) {
@@ -206,6 +205,7 @@
         }
         [MBProgressHUD showAndHideWithDetail:errorMessage forHUD:nil];
     }];
+    
 }
 
 @end

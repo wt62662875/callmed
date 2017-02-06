@@ -112,10 +112,10 @@
         
         CLLocation *oLocation = [[CLLocation alloc] initWithLatitude:[GlobalData sharedInstance].coordinate.latitude longitude:[GlobalData sharedInstance].coordinate.longitude];
         CLLocationDistance distance_s = [oLocation distanceFromLocation:location];
-        
         //记录时时两点距离作为行程距离
         [GlobalData sharedInstance].distances = [GlobalData sharedInstance].distances + distance_s;
-        if (distance_s>=10) {
+
+        if (distance_s>=30) {
             
             
             [[GlobalData sharedInstance].dictDistance enumerateKeysAndObjectsUsingBlock:^(id key, OrderDistance *obj, BOOL *stop) {

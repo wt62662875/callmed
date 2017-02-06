@@ -14,6 +14,7 @@
 #import "CarpoolingView.h"
 #import "SwitchButton.h"
 #import <AVFoundation/AVFoundation.h>
+#import "carPoolingList2ViewController.h"
 
 @interface CarPoolingListController () <UITableViewDataSource,UITableViewDelegate,TargetActionDelegate>
 {
@@ -70,6 +71,7 @@
     }];
     
     _mTableView =[[UITableView alloc] initWithFrame:CGRectMake(0, 0, 0, 0) style:UITableViewStylePlain];
+    [_mTableView setBackgroundColor:RGBHex(g_assit_gray)];
     _mTableView.delegate = self;
     _mTableView.dataSource = self;
     _mTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
@@ -124,6 +126,8 @@
 //    {
 //        [cell setBottomLineHidden:YES];
 //    }
+    cell.moreOrder.tag = indexPath.section;
+    [cell.moreOrder addTarget:self action:@selector(moreOrderClick:) forControlEvents:UIControlEventTouchUpInside];
     OrderModel *model = _dataArray[indexPath.section];
     NSLog(@"%@",model);
     [cell setModel:model];
@@ -131,6 +135,16 @@
     cell.getOrder.tag = indexPath.section;
     [cell.getOrder addTarget:self action:@selector(getOrder:) forControlEvents:UIControlEventTouchUpInside];
     return cell;
+}
+-(void)moreOrderClick:(UIButton *)sender{
+    OrderModel *model = _dataArray[sender.tag];
+    carPoolingList2ViewController *carPoolingList2VC = [[carPoolingList2ViewController alloc]init];
+    [carPoolingList2VC setLineID:model.lineId];
+    [carPoolingList2VC setLineName:model.lineName];
+
+    [self.navigationController pushViewController:carPoolingList2VC animated:YES];
+    NSLog(@"%@",model);
+
 }
 -(void)getOrder:(UIButton *)sender{
     _model = _dataArray[sender.tag];
@@ -323,8 +337,8 @@
 
 - (void) reloadData
 {
-    [self fetchData];
-    //[_mTableView.mj_header beginRefreshing];
+//    [self fetchData];】
+    [_mTableView.mj_header beginRefreshing];
 }
 
 
@@ -371,6 +385,9 @@
             [self.navigationController pushViewController:route animated:YES];
         }else if(tag == 41){
             [CommonUtility callMessage:_model.mPhoneNo];
+            [poolView removeFromSuperview];
+        }else if(tag==6)
+        {
             [poolView removeFromSuperview];
         }
     }

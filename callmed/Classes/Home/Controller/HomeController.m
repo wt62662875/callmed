@@ -36,6 +36,8 @@
 #import "carInformationViewController.h"
 #import "accountInformationViewController.h"
 #import "tripViewController.h"
+#import "personalDataViewController.h"
+#import <AVFoundation/AVFoundation.h>
 
 #define OPENCENTERX 250.0
 #define DIVIDWIDTH 70.0 //OPENCENTERX 对应确认是否打开或关闭的分界线。
@@ -59,6 +61,7 @@
 @property (nonatomic,strong) HomeBackView *leftView;
 
 @property (nonatomic,strong) UIView *blackView;
+@property(nonatomic,strong) AVAudioPlayer *movePlayer ;
 
 /**
  * 动画是否进行e
@@ -202,7 +205,7 @@
     
     if(recognizer.state == UIGestureRecognizerStateEnded)
     {
-        [UIView animateWithDuration:0.75
+        [UIView animateWithDuration:0.2
                               delay:0.01
                             options:UIViewAnimationOptionCurveEaseInOut
                          animations:^(void)
@@ -232,7 +235,7 @@
 
 -(void) handleTap:(UITapGestureRecognizer*) recognizer
 {
-    [UIView animateWithDuration:0.75
+    [UIView animateWithDuration:0.2
                           delay:0.01
                         options:UIViewAnimationOptionTransitionCurlUp animations:^(void){
                             _blackView.alpha = 0.0;
@@ -444,7 +447,7 @@
             _blackView.backgroundColor = [UIColor blackColor];
             [_backView addSubview:_blackView];
         }
-        [UIView animateWithDuration:0.75
+        [UIView animateWithDuration:0.2
                               delay:0.01
                             options:UIViewAnimationOptionTransitionCurlUp animations:^(void){
                                 _blackView.alpha = 0.5;
@@ -474,6 +477,10 @@
             }
             [_bottomView setSelectIndex:0];
             [self buttonSelectedIndex:0];
+            if (orderView.buttonType==6) {
+                [orderView dismiss];
+                return;
+            }
             if ([@"1" isEqualToString:order.type]) {
                 [orderView dismiss];
                 [OrderModel driverRobOrderId:order.ids driver:[GlobalData sharedInstance].user.userInfo.ids succes:^(NSDictionary *resultDictionary) {
@@ -538,11 +545,11 @@
             } failed:^(NSInteger errorCode, NSString *errorMessage) {
                 [MBProgressHUD showAndHideWithMessage:errorMessage forHUD:nil];
             }];
-        }else if (tag==2) {
+        }else if (tag==2 || tag==6) {
             [poolView removeFromSuperview];
         }
         
-        UserCenterController *mUserCenter = [[UserCenterController alloc] init];
+        personalDataViewController *personalDataVC = [[personalDataViewController alloc]initWithNibName:@"personalDataViewController" bundle:nil];
         helpViewController *helpVC = [[helpViewController alloc]initWithNibName:@"helpViewController" bundle:nil];
         setUpViewController *setUpVC = [[setUpViewController alloc]initWithNibName:@"setUpViewController" bundle:nil];
         carInformationViewController *carInformationVC = [[carInformationViewController alloc]initWithNibName:@"carInformationViewController" bundle:nil];
@@ -550,7 +557,7 @@
         tripViewController *tripVC = [[tripViewController alloc]initWithNibName:@"tripViewController" bundle:nil];
         switch (tag) {
             case 10:             //头像
-                [self.navigationController pushViewController:mUserCenter animated:YES];
+                [self.navigationController pushViewController:personalDataVC animated:YES];
                 break;
             case 11:             //行程
                 [self.navigationController pushViewController:tripVC animated:YES];
@@ -645,7 +652,15 @@
             switch ([order.type integerValue]) {
                 case 1:
                 {
+                    NSString *tmp= [[NSBundle mainBundle] pathForResource:@"newOrder" ofType:@"mp3"];
+                    NSURL *moveMP3=[NSURL fileURLWithPath:tmp];
+                    NSError *err=nil;
+                    self.movePlayer=[[AVAudioPlayer alloc] initWithContentsOfURL:moveMP3 error:&err];
+                    self.movePlayer.volume=1.0;
+                    [self.movePlayer prepareToPlay];
+                    [self.movePlayer play];
                     NoticeSpecialView *noticeView = [[NoticeSpecialView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+
                     noticeView.delegate = self;
                     noticeView.bizType=@"0";
                     [noticeView setModel:order];
@@ -665,6 +680,14 @@
                 }break;
                 case 7:
                 {
+                    NSString *tmp= [[NSBundle mainBundle] pathForResource:@"cClose" ofType:@"wav"];
+                    NSURL *moveMP3=[NSURL fileURLWithPath:tmp];
+                    NSError *err=nil;
+                    self.movePlayer=[[AVAudioPlayer alloc] initWithContentsOfURL:moveMP3 error:&err];
+                    self.movePlayer.volume=1.0;
+                    [self.movePlayer prepareToPlay];
+                    [self.movePlayer play];
+
                     NoticeViewCommon *noticeView = [[NoticeViewCommon alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
                     noticeView.delegate = self;
                     [noticeView setModel:order];
@@ -683,6 +706,14 @@
                 }break;
                 case 20:
                 {
+                    NSString *tmp= [[NSBundle mainBundle] pathForResource:@"newMessage" ofType:@"m4r"];
+                    NSURL *moveMP3=[NSURL fileURLWithPath:tmp];
+                    NSError *err=nil;
+                    self.movePlayer=[[AVAudioPlayer alloc] initWithContentsOfURL:moveMP3 error:&err];
+                    self.movePlayer.volume=1.0;
+                    [self.movePlayer prepareToPlay];
+                    [self.movePlayer play];
+
                     [self showAlertMessage:@"暂无业务处理!"];
                 }break;
                 default:
@@ -692,13 +723,31 @@
                 [_currentController reloadData];
             }
         }else if([@"2" isEqualToString:order.oType]){
+            NSString *tmp= [[NSBundle mainBundle] pathForResource:@"cClose" ofType:@"wav"];
+            NSURL *moveMP3=[NSURL fileURLWithPath:tmp];
+            NSError *err=nil;
+            
+            NSString *tmp2= [[NSBundle mainBundle] pathForResource:@"newMessage" ofType:@"m4r"];
+            NSURL *moveMP32=[NSURL fileURLWithPath:tmp2];
+            
+
             switch ([order.type integerValue])
             {
                 case 7:
+                    self.movePlayer=[[AVAudioPlayer alloc] initWithContentsOfURL:moveMP3 error:&err];
+                    self.movePlayer.volume=1.0;
+                    [self.movePlayer prepareToPlay];
+                    [self.movePlayer play];
+
                     [self showCommNotice:order];
                     break;
                 case 20:
                 {
+                    self.movePlayer=[[AVAudioPlayer alloc] initWithContentsOfURL:moveMP32 error:&err];
+                    self.movePlayer.volume=1.0;
+                    [self.movePlayer prepareToPlay];
+                    [self.movePlayer play];
+                    
                     [self showAlertMessage:@"暂无业务处理!"];
                 }break;
                     default:
@@ -817,6 +866,7 @@
 
 - (void) showCommNotice:(NotificationModel*)order
 {
+    
     NoticeViewCommon *noticeView = [[NoticeViewCommon alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     noticeView.delegate = self;
     [noticeView setModel:order];

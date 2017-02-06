@@ -90,11 +90,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "callmed/Classes/Authorization/Controller/DriverInfoEditController.m"
-            timestampString = "503566720.140369"
+            timestampString = "506917036.7371"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "903"
-            endingLineNumber = "903"
+            startingLineNumber = "901"
+            endingLineNumber = "901"
             landmarkName = "-setDataEnable:"
             landmarkType = "7">
             <Locations>
@@ -153,28 +153,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "callmed/Classes/Home/Controller/HomeController.m"
-            timestampString = "506835759.338007"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "579"
-            endingLineNumber = "579"
-            landmarkName = "-orderNotice:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "callmed/Classes/UserCenter/Controller/UserCenterController.m"
-            timestampString = "503805303.558349"
+            timestampString = "506917036.7371"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "345"
-            endingLineNumber = "345"
+            startingLineNumber = "342"
+            endingLineNumber = "342"
             landmarkName = "-buttonTarget:"
             landmarkType = "7">
          </BreakpointContent>
@@ -218,12 +202,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "callmed/Classes/TripOrderCenter/Controller/TripCataController.m"
-            timestampString = "506490669.213153"
+            timestampString = "507023582.240638"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "76"
-            endingLineNumber = "76"
+            startingLineNumber = "77"
+            endingLineNumber = "77"
             landmarkName = "-outCarJump2:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "callmed/Classes/Home/xib/helpViewController.m"
+            timestampString = "507022910.40032"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "-buttonClick:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

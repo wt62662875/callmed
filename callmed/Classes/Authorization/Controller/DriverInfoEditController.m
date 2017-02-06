@@ -323,8 +323,8 @@
     [self.leftButton setContentVerticalAlignment:UIControlContentVerticalAlignmentCenter];
     [self.leftButton setContentMode:UIViewContentModeCenter];
     [self.leftButton addTarget:self action:@selector(buttonTarget:) forControlEvents:UIControlEventTouchUpInside];
-    [self.rightButton setHidden:YES];
-    [self.rightButton setTitleColor:RGBHex(g_m_c) forState:UIControlStateNormal];
+//    [self.rightButton setHidden:YES];
+//    [self.rightButton setTitleColor:RGBHex(g_m_c) forState:UIControlStateNormal];
     UIView *topHeaderView = [[UIView alloc] init];
     [topHeaderView setBackgroundColor:RGBHex(g_m_c)];
     [self.view addSubview:topHeaderView];
@@ -532,10 +532,8 @@
 - (void) buttonTarget:(id)sender
 {
     if (sender == self.leftButton) {
-        [self.navigationController popViewControllerAnimated:YES];
-    }else if(sender == self.rightButton)
-    {
         [self saveUserIcon];
+        [self.navigationController popViewControllerAnimated:YES];
     }else if([sender isKindOfClass:[UIImageView class]])
     {
         [self openPhotoChoiceDialog];
@@ -814,12 +812,12 @@
     [picker dismissViewControllerAnimated:YES completion:nil];
     [self.mTableView reloadData];
     
-    if (image) {
-        [self setRightButtonText:@"保存头像" withFont:[UIFont systemFontOfSize:14]];
-        [self.rightButton setHidden:NO];
-    }else{
-        [self.rightButton setHidden:YES];
-    }
+//    if (image) {
+//        [self setRightButtonText:@"保存头像" withFont:[UIFont systemFontOfSize:14]];
+//        [self.rightButton setHidden:NO];
+//    }else{
+//        [self.rightButton setHidden:YES];
+//    }
 }
 
 #pragma mark 取消 imagePickerController
@@ -847,7 +845,7 @@
     [AuthItemModel saveAuthVerifyedInfo:params success:^(NSDictionary *resultDictionary) {
         NSLog(@"resultDictionary:%@",resultDictionary);
         [MBProgressHUD showAndHideWithMessage:@"头像保存成功!" forHUD:nil];
-        [self.rightButton setHidden:YES];
+//        [self.rightButton setHidden:YES];
         [hud hide:YES];
         
         UserInfoModel *userInfo = [[UserInfoModel alloc] initWithDictionary:[resultDictionary objectForKey:@"data"] error:nil];
@@ -861,7 +859,7 @@
         [self.mTableView reloadData];
     } failed:^(NSInteger errorCode, NSString *errorMessage) {
         [MBProgressHUD showAndHideWithMessage:errorMessage forHUD:nil];
-        [self.rightButton setHidden:YES];
+//        [self.rightButton setHidden:YES];
         [hud hide:YES];
     }];
 }

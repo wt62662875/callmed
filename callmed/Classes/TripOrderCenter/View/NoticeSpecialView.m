@@ -19,6 +19,7 @@
 @property (nonatomic,strong) UIButton *buttonCall;
 @property (nonatomic,strong) UIButton *buttonSubmit;
 @property (nonatomic,strong) UIButton *buttonCancel;
+@property (nonatomic,strong) UIButton *closeView;
 
 @property (nonatomic,strong) LeftIconLabel *beginLabel;
 @property (nonatomic,strong) LeftIconLabel *endLabel;
@@ -126,17 +127,7 @@
         make.left.equalTo(_top_containerView).offset(10);
         make.height.mas_equalTo(30);
     }];
-    
-    _moneyLabel = [[UILabel alloc] init];
-    [_moneyLabel setText:@"￥123.15"];
-    [_moneyLabel setTextColor:[UIColor whiteColor]];
-    [_top_containerView addSubview:_moneyLabel];
-    [_moneyLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerY.equalTo(_top_containerView);
-        make.right.equalTo(_top_containerView).offset(-10);
-        make.height.mas_equalTo(30);
-    }];
-    
+
     
     _distanceLabel =[[UILabel alloc] init];
     [_distanceLabel setText:@"距离1.5公里"];
@@ -150,8 +141,18 @@
     [_distanceLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(_top_containerView.mas_bottom).offset(10);
         make.left.equalTo(_top_containerView).offset(10);
-        make.height.mas_equalTo(20);
+        make.height.mas_equalTo(30);
         make.width.mas_equalTo(100);
+    }];
+    
+    _moneyLabel = [[UILabel alloc] init];
+    [_moneyLabel setText:@"￥123.15"];
+    [_moneyLabel setTextColor:RGBHex(g_yellow)];
+    [_top_containerView addSubview:_moneyLabel];
+    [_moneyLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(_distanceLabel);
+        make.right.equalTo(_top_containerView).offset(-10);
+        make.height.mas_equalTo(30);
     }];
     
     _userView =[[LeftIconLabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
@@ -244,6 +245,17 @@
         make.bottom.equalTo(_containerView).offset(-10);
         make.width.mas_equalTo(100);
     }];
+    
+    _closeView = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_closeView setImage:[UIImage imageNamed:@"guanbi"] forState:UIControlStateNormal];
+    [_closeView setTag:6];
+    [_closeView addTarget:self action:@selector(buttonTarget:) forControlEvents:(UIControlEventTouchUpInside)];
+    [_containerView addSubview:_closeView];
+    [_closeView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(_timeLabel);
+        make.right.equalTo(_top_containerView).offset(-10);
+    }];
+    
     [self initTimer];
 }
 
@@ -335,6 +347,10 @@
     }else if(button==self.buttonCall)
     {
         _buttonType = 2;
+    }
+    else if(button==_closeView)
+    {
+        _buttonType = 6;
     }
     if (_delegate &&[_delegate respondsToSelector:@selector(buttonTarget:)]) {
         [_delegate buttonTarget:self];

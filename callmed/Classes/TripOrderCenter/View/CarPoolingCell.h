@@ -13,4 +13,6 @@
 @property (nonatomic,strong) OrderModel *model;
 @property (nonatomic,strong) UIButton *getOrder;
 
+@property (nonatomic,strong) UIButton *moreOrder;
+
 @end

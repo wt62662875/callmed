@@ -280,6 +280,13 @@
     [_fee setTitle:[NSString stringWithFormat:@"￥%@",_model.fee]];
     //getOrderDescription
 
+    if ([_model.state isEqualToString:@"6"]) {
+        _buttonStatus.backgroundColor = [UIColor whiteColor];
+        [_buttonStatus setTitleColor:RGBHex(g_blue) forState:UIControlStateNormal];
+    }else{
+        _buttonStatus.backgroundColor = RGBHex(g_blue);
+        [_buttonStatus setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    }
     [_buttonStatus setTitle:[CommonUtility getDriverOrderDescription:_model.state] forState:UIControlStateNormal];
     if ([@"3" isEqualToString:_model.state] || [@"4" isEqualToString:_model.state] || [@"5" isEqualToString:_model.state]) {
         [_buttonStatus setUserInteractionEnabled:YES];

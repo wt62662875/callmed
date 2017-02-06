@@ -29,6 +29,8 @@
 - (void) viewDidLoad
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadRedBall:) name:NOTICE_NEED_REDBALL object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(outCarJump2:) name:@"outCarJump2" object:nil];
+
     [super viewDidLoad];
     [self initData];
     [self initView];
@@ -69,7 +71,6 @@
         make.height.mas_equalTo(50);
         make.width.equalTo(self.view);
     }];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(outCarJump2:) name:@"outCarJump2" object:nil];
     
 }
 -(void)outCarJump2:(NSNotification*)aNotification{
@@ -77,9 +78,9 @@
     [_tripView setSelectIndex:[str intValue]];
     [self buttonSelectedIndex:[str intValue]];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NOTICE_NEED_CHANGE_MYORDERLIST" object:nil];
-
-    
+    if ([str isEqualToString:@"1"]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"NOTICE_NEED_CHANGE_MYORDERLIST" object:nil];
+    }
 }
 - (void) buttonTarget:(id)sender
 {

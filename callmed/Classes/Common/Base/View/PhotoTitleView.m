@@ -60,7 +60,7 @@
 
 - (void) setImageUrl:(NSString *)imageUrl
 {
-    if (imageUrl && [imageUrl hasPrefix:@"http"]) {
+    if (imageUrl && [imageUrl hasPrefix:@"https"]) {
         [_iconImageView sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:[UIImage imageNamed:@"DF_img"]];
     }else{
         [_iconImageView setImage:[UIImage imageNamed:@"DF_img"]];
