@@ -125,7 +125,6 @@
         make.left.equalTo(self.headerView).offset(10);
         make.width.height.mas_equalTo(44);
         make.bottom.equalTo(self.headerView).offset(0);
-        
     }];
     [self.rightButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self.headerView).offset(20);
@@ -748,7 +747,7 @@
                     [self.movePlayer prepareToPlay];
                     [self.movePlayer play];
                     
-                    [self showAlertMessage:@"暂无业务处理!"];
+//                    [self showAlertMessage:@"暂无业务处理!"];
                 }break;
                     default:
                     break;
